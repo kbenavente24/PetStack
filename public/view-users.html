@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PetStack - All Users</title>
+    <style>
+        /* Center the users table on the page */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        /* Container styling with border */
+        .container {
+            border: 2px solid #333;
+            padding: 20px;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PetStack Users Database</h1>
+        <!-- Display total user count (updated after fetching data) -->
+        <p id="userCount">Loading...</p>
+
+        <!-- Table to display all users from the database -->
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Initial loading message (will be replaced with actual user data) -->
+                <tr>
+                    <td colspan="3">Loading users...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <!-- Link to navigate back to signup page -->
+        <a href="/signup.html">← Back to Sign Up</a>
+    </div>
+
+    <script>
+        // Fetch and display users when the page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userTableBody = document.getElementById('userTableBody');
+            const userCount = document.getElementById('userCount');
+
+            try {
+                // Fetch all users from the backend API
+                const response = await fetch('/users/view');
+                const users = await response.json();
+
+                // Clear the loading message
+                userTableBody.innerHTML = '';
+                // Update the user count display
+                userCount.textContent = `Total Users: ${users.length}`;
+
+                // Populate table with user data
+                if (users.length > 0) {
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.user_id}</td>
+                            <td>${user.display_name || 'Not set'}</td>
+                            <td>${user.email}</td>
+                        `;
+                        userTableBody.appendChild(row);
+                    });
+                } else {
+                    // Display message if no users are found
+                    userTableBody.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';
+                }
+            } catch (error) {
+                // Handle errors when fetching users
+                console.error('Error fetching users:', error);
+                userTableBody.innerHTML = '<tr><td colspan="3">Error loading users.</td></tr>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PetStack - Sign Up</title>
+    <style>
+        /* Center the signup form on the page */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        /* Container styling with border */
+        .container {
+            border: 2px solid #333;
+            padding: 20px;
+            max-width: 400px;
+        }
+        /* Styling for the view all users button */
+        .view-all-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PetStack Sign Up (DEMO)</h1>
+
+        <!-- Message area for displaying errors and notifications -->
+        <div id="messageArea" style="display: none;"></div>
+
+        <!-- Signup Form: Email and password registration -->
+        <div id="signupSection">
+            <form id="signupForm">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <br><br>
+
+                <!-- Password must be at least 10 characters -->
+                <label for="password">Password (min 10 characters):</label>
+                <input type="password" id="password" name="password" required minlength="10">
+                <br><br>
+
+                <!-- Confirm password field for validation -->
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="10">
+                <br><br>
+
+                <button type="submit">Sign Up</button>
+            </form>
+
+            <!-- Button to view all registered users in the database -->
+            <div class="view-all-btn">
+                <button onclick="location.href='/view-users.html'">Show All Users in Database</button>
+            </div>
+        </div>
+
+        <!-- Display Name Section: Set display name after successful signup -->
+        <div id="displayNameSection" style="display: none;">
+            <p>Welcome! Please enter your display name (what your fellow pet caretakers will see you as):</p>
+            <form id="displayNameForm">
+                <!-- Hidden field to store the user ID from the signup response -->
+                <input type="hidden" id="userId" name="user_id">
+
+                <label for="display_name">Display Name:</label>
+                <input type="text" id="display_name" name="display_name" required>
+                <br><br>
+
+                <button type="submit">Continue</button>
+            </form>
+        </div>
+
+        <!-- Success Section: Confirmation after completing signup -->
+        <div id="successSection" style="display: none;">
+            <h2>Success!</h2>
+            <p>Your profile has been saved to the database.</p>
+            <div id="userInfo"></div>
+            <br>
+            <button onclick="location.href='/view-users.html'">View All Users in Database</button>
+            <button onclick="location.reload()">Create Another Account</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to form elements and sections
+        const signupForm = document.getElementById('signupForm');
+        const displayNameForm = document.getElementById('displayNameForm');
+        const messageArea = document.getElementById('messageArea');
+        const signupSection = document.getElementById('signupSection');
+        const displayNameSection = document.getElementById('displayNameSection');
+        const successSection = document.getElementById('successSection');
+
+        // Handle signup form submission (Step 1: Create account)
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect form data
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+
+            try {
+                // Send signup request to backend API
+                const response = await fetch('/users/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, confirm_password })
+                });
+
+                const data = await response.json();
+
+                // If signup successful, move to display name section
+                if (data.success) {
+                    signupSection.style.display = 'none';
+                    displayNameSection.style.display = 'block';
+                    // Store user ID for the next step
+                    document.getElementById('userId').value = data.userId;
+                } else {
+                    // Display error message if signup failed
+                    showMessage(data.error);
+                }
+            } catch (error) {
+                // Handle network or server errors
+                showMessage('Network error. Please try again.');
+            }
+        });
+
+        // Handle display name form submission (Step 2: Set display name)
+        displayNameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get user ID and display name
+            const user_id = document.getElementById('userId').value;
+            const display_name = document.getElementById('display_name').value;
+
+            try {
+                // Send display name to backend API
+                const response = await fetch('/users/set-displayname', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id, display_name })
+                });
+
+                const data = await response.json();
+
+                // If successful, show success section with user info
+                if (data.success) {
+                    displayNameSection.style.display = 'none';
+                    successSection.style.display = 'block';
+
+                    // Display the user's information
+                    document.getElementById('userInfo').innerHTML = `
+                        <p><strong>Display Name:</strong> ${data.user.displayName}</p>
+                        <p>If you'd like to see that your sign up was successful, click the "view all users"
+                            button and your entry will be at the bottom.</p>
+                    `;
+                } else {
+                    // Display error message if setting display name failed
+                    showMessage(data.error);
+                }
+            } catch (error) {
+                // Handle network or server errors
+                showMessage('Network error. Please try again.');
+            }
+        });
+
+        // Helper function to display messages to the user
+        function showMessage(text) {
+            messageArea.textContent = text;
+            messageArea.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
