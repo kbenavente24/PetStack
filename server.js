@@ -7,8 +7,9 @@ const app = express();
 // Load our .env info by importing dotenv package and using its config() function
 require('dotenv').config();
 
-// Import our userController (contains backend logic and database queries)
-const userController = require('./controllers/userController');
+// Import our controllers (contain backend logic and database queries)
+const userController = require('./controllers/signup');
+const viewUsersController = require('./controllers/viewUsers');
 
 // Middleware Setup
 app.use(express.json());
@@ -24,7 +25,7 @@ app.post('/users/signup', userController.signup);
 app.post('/users/set-displayname', userController.setDisplayName);
 
 // GET /users/view - Get all users as JSON for the view-users.html page
-app.get('/users/view', userController.viewAllUsers);
+app.get('/users/view', viewUsersController.viewAllUsers);
 
 // Start the Server
 // Define port that our server will listen on. If no port is set in the .env file, it will use 3000 by default
