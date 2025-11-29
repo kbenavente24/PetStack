@@ -9,7 +9,8 @@ require('dotenv').config();
 
 // Import our controllers (contain backend logic and database queries)
 const userController = require('./controllers/signup');
-const viewUsersController = require('./controllers/viewUsers');
+const loginController = require('./controllers/login'); // <-- NEW
+const households = require('./controllers/households');
 
 // Middleware Setup
 app.use(express.json());
@@ -24,8 +25,11 @@ app.post('/users/signup', userController.signup);
 // POST /users/set-displayname - Handle setting display name
 app.post('/users/set-displayname', userController.setDisplayName);
 
-// GET /users/view - Get all users as JSON for the view-users.html page
-app.get('/users/view', viewUsersController.viewAllUsers);
+// POST /users/login - Handle login (email + password)
+app.post('/users/login', loginController.login); // <-- NEW
+
+app.get('/users/viewhouseholds', households.viewhouseholds);
+app.get('/pets/byhousehold', households.viewPetsByHousehold);
 
 // Start the Server
 // Define port that our server will listen on. If no port is set in the .env file, it will use 3000 by default

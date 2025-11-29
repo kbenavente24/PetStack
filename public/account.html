@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PetStack - Your Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* Dashboard Navigation */
+        .dashboard-nav {
+            background-color: #333;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        .nav-item.active {
+            background-color: #667eea;
+        }
+
+        .header {
+            text-align: center;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-text {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .content-wrapper {
+            padding: 0 20px 20px 20px;
+        }
+
+        /* Household View */
+        #householdView {
+            display: block;
+        }
+
+        .households-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .household-card {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .household-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            word-wrap: break-word;
+        }
+
+        /* Pet View */
+        #petView {
+            display: none;
+        }
+
+        .back-button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .household-title {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .pets-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .pet-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pet-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .pet-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            padding: 50px;
+        }
+
+        .error {
+            text-align: center;
+            font-size: 18px;
+            color: #d32f2f;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Dashboard Navigation -->
+<nav class="dashboard-nav">
+    <div class="dashboard-logo">PetStack</div>
+    <ul class="nav-menu">
+        <li class="nav-item active" id="navHouseholds" onclick="navigateTo('households')">Households</li>
+        <li class="nav-item" id="navPets" onclick="navigateTo('pets')">Pets</li>
+        <li class="nav-item" id="navAccount" onclick="navigateTo('account')">Account</li>
+    </ul>
+</nav>
+
+<div class="content-wrapper">
+    <div class="header">
+        <h1 id="pageTitle">Your Households</h1>
+        <p class="welcome-text" id="welcomeText">Loading...</p>
+    </div>
+
+    <!-- Household View -->
+    <div id="householdView">
+        <div id="householdsContainer" class="households-container">
+            <div class="loading">Loading your households...</div>
+        </div>
+    </div>
+
+    <!-- Pet View -->
+    <div id="petView">
+        <button class="back-button" onclick="showHouseholds()">← Back to Households</button>
+        <h2 class="household-title" id="currentHouseholdName"></h2>
+        <div id="petsContainer" class="pets-container">
+            <div class="loading">Loading pets...</div>
+        </div>
+    </div>
+
+    <!-- All Pets View (for Pets menu item) -->
+    <div id="allPetsView" style="display: none;">
+        <div id="allPetsContainer" class="pets-container">
+            <div class="loading">Loading all your pets...</div>
+        </div>
+    </div>
+
+    <!-- Account View -->
+    <div id="accountView" style="display: none;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #333;">
+            <h2 style="margin-bottom: 20px;">Account Information</h2>
+            <div style="margin-bottom: 15px;">
+                <strong>Display Name:</strong> <span id="accountDisplayName"></span>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Email:</strong> <span id="accountEmail"></span>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>User ID:</strong> <span id="accountUserId"></span>
+            </div>
+            <br>
+            <button onclick="logout()" style="background-color: #d32f2f; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px;">Logout</button>
+        </div>
+    </div>
+</div>
+
+<script src="account.js"></script>
+
+</body>
+</html>
