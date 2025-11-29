@@ -36,6 +36,10 @@ app.get('/users/view', viewUsersController.viewAllUsers);
 
 app.get('/users/viewhouseholds', activities.viewhouseholds);
 
+app.get('/users/viewNotesAndActivities', activities.viewNotesAndActivities);
+
+app.get('/users/viewPets', activities.viewPets);
+
 // Start the Server
 // Define port that our server will listen on. If no port is set in the .env file, it will use 3000 by default
 const PORT = process.env.PORT || 3000;
