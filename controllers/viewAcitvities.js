@@ -30,6 +30,50 @@ const viewhouseholds = async (req, res) => {
   }
 };
 
+const viewNotesAndActivities = async (req, res) => {
+  try {
+    const petId = req.query.pet_id;
+
+    const result = await pool.query(
+      `
+      SELECT *
+      from "pet" as p join "activity" as a on a.pet_id = p.pet_id
+      where a.pet_id = $1
+      `,
+      [petId]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Failed to load households" });
+  }
+};
+
+const viewPets = async (req, res) => {
+  try {
+    const houseId = req.query.household_id;
+
+    const result = await pool.query(
+      `
+      SELECT *
+      from "pet" as p
+      where p.household_id = $1
+      `,
+      [houseId]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Failed to load households" });
+  }
+};
+
 module.exports = {
-  viewhouseholds
+  viewhouseholds,
+  viewNotesAndActivities,
+  viewPets
 };
