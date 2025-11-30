@@ -9,15 +9,12 @@ require('dotenv').config();
 
 // Import our controllers (contain backend logic and database queries)
 const userController = require('./controllers/signup');
-const viewUsersController = require('./controllers/viewUsers');
 const loginController = require('./controllers/login'); // <-- NEW
-const activities = require('./controllers/viewAcitvities');
+const households = require('./controllers/households');
 
 // Middleware Setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve all files in /public (signup.html, login.html, account.html, etc.)
 app.use(express.static('public'));
 
 // DEFINING ROUTES (What the frontend calls to interact with the backend)
@@ -31,14 +28,9 @@ app.post('/users/set-displayname', userController.setDisplayName);
 // POST /users/login - Handle login (email + password)
 app.post('/users/login', loginController.login); // <-- NEW
 
-// GET /users/view - Get all users as JSON for the view-users.html page
-app.get('/users/view', viewUsersController.viewAllUsers);
-
-app.get('/users/viewhouseholds', activities.viewhouseholds);
-
-app.get('/users/viewNotesAndActivities', activities.viewNotesAndActivities);
-
-app.get('/users/viewPets', activities.viewPets);
+app.get('/users/viewhouseholds', households.viewhouseholds);
+app.get('/users/viewNotesAndActivities', households.viewNotesAndActivities);
+app.get('/pets/byhousehold', households.viewPetsByHousehold);
 
 // Start the Server
 // Define port that our server will listen on. If no port is set in the .env file, it will use 3000 by default
