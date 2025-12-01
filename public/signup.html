@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>PetStack - Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light+Two&display=swap" rel="stylesheet">
+
     <style>
         /* Center the signup form on the page */
         body {
@@ -11,23 +15,59 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
+            background-color: rgb(121 201 250);
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 151 178), transparent);
+            font-family: "Shadows Into Light Two", cursive, Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            text-shadow: 5px 5px 15px rgb(0, 0, 0);
+            color: white;
         }
         /* Container styling with border */
-        .container {
+        .sign-up-container {
             border: 2px solid #333;
+            background-color: rgb(0 75 132);
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 151 178), transparent);
+            border: rgb(13, 66, 87) 1px solid;
+            border-radius: 0.5rem;
             padding: 20px;
-            max-width: 400px;
+            height: 31rem;
+            max-width: 25rem;
+            text-align: center;
         }
         /* Styling for the view all users button */
         .view-all-btn {
             text-align: center;
             margin-top: 20px;
         }
+        button {
+            margin-top: 1rem;
+            border-radius: 5px;
+            width: 11rem;
+            height: 3.5rem;
+            background-color: rgb(255 165 198);
+        }
+        button:hover {
+            background-color: rgb(249 116 166);
+        }
+        button:active {
+            background-color: rgb(211, 99, 142);
+        }
+        input {
+            width: 17rem;
+            height: 1.75rem;
+        }
+        .input-box {
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+        }
+        h1{
+            margin-top: 0.5rem;
+            margin-bottom: 0.7rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="sign-up-container">
         <h1>PetStack Sign Up (DEMO)</h1>
 
         <!-- Message area for displaying errors and notifications -->
@@ -36,23 +76,24 @@
         <!-- Signup Form: Email and password registration -->
         <div id="signupSection">
             <form id="signupForm">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                <br><br>
-
+                <div class="input-box">
+                    <label for="email">Email:</label>
+                    <br>
+                    <input type="email" id="email" name="email" required>
+                </div>
                 <!-- Password must be at least 10 characters -->
-                <label for="password">Password (min 10 characters):</label>
-                <input type="password" id="password" name="password" required minlength="10">
-                <br><br>
-
+                <div class="input-box">
+                    <label for="password">Password (min 10 characters):</label>
+                    <input type="password" id="password" name="password" required minlength="10">
+                </div>
                 <!-- Confirm password field for validation -->
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required minlength="10">
-                <br><br>
-
+                <div class="input-box">
+                    <label for="confirm_password">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="10">
+                </div>
+            
                 <button type="submit">Sign Up</button>
             </form>
-
         </div>
 
         <!-- Display Name Section: Set display name after successful signup -->
