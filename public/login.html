@@ -3,48 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <title>PetStack - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light+Two&display=swap" rel="stylesheet">
 
     <style>
+        /* Google Font */
+        .shadows-into-light-two-regular {
+            font-family: "Shadows Into Light Two", cursive;
+            font-weight: 400;
+            font-style: normal;
+        }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: rgb(0 151 178);
+            font-family: "Shadows Into Light Two", cursive, Arial, Helvetica, sans-serif;
+            text-shadow: 5px 5px 15px rgb(0, 0, 0);
+            color: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1em;
             min-height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
+            grid-template-areas: "aside main";     
         }
-        .container {
-            border: 2px solid #333;
+        .main {
+            background-color: rgb(0 75 132);
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 151 178), transparent);
+            grid-area: main;
+            border: 2px;
+            border-color: white;
+            justify-items: center;
+            align-items: center;
+            align-content: center;
+        }
+        .aside {
+            background-color: rgb(0 151 178);
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 75 132), transparent);
+            grid-area: aside;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .hero-card {
+            position: relative;
+            display: grid;
+            background-color: rgb(121 201 250);
+            border-radius: 1rem;
+            border: rgb(13, 66, 87) 1px solid;
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 151 178), transparent);
+            justify-content: center;
+            align-content: center;
+            text-align: center;
+            height: 70%;
+            width: 100%;
+            max-width: 35rem;
+        }
+        .hero-text {
+            font-size: 22px;
+        }
+        .carousel {
+            width: 99%;
+            height: 99%;
+            overflow-x: auto;
+            margin: 1em auto;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 100%;
+            gap: 1em;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            anchor-name: --carousel;           
+        }
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: -75px;
+            right: -75px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .carousel-btn {
+            pointer-events: auto;
+            border: none;
+            background-color: rgb(249 116 166);
+            color: white;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .carousel-btn:hover {
+            background-color: rgb(211, 99, 142);
+        }
+        .carousel-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .carousel-card {
+            height: 25em;
+            padding: 1em;
+            border-radius: 0.5em;
+            text-align: center;
+            font-size: 20px;
+            align-content: center;
+            scroll-snap-align: center;
+        }
+        .login-container {
+            border: rgb(13, 66, 87) 1px solid;
+            border-radius: 0.5rem;
+            background-color: rgb(121 201 250);
+            background-image: radial-gradient(circle at 50% 100%, rgb(0 151 178), transparent);
             padding: 20px;
-            max-width: 400px;
+            height: 25rem;
+            max-width: 25rem;
+            text-align: center;
+            text-shadow: 2px 2px 10px rgb(0, 0, 0);
+        }
+        .input-box {
+            padding-bottom: 0.5rem;
         }
         .view-all-btn {
-            text-align: center;
-            margin-top: 15px;
+            margin-top: 2rem;
+        }
+        /* Sign up button */
+        .view-all-btn button{
+            margin-top: 0.2rem;
+            border-radius: 5px;
+            width: 11rem;
+            height: 3.5rem;
+            background-color: rgb(255 165 198);
+        }
+        .view-all-btn button:hover {
+            background-color: rgb(249 116 166);
+        }
+        .view-all-btn button:active {
+            background-color: rgb(211, 99, 142);
+        }
+        /* Login Button */
+        form button {
+            width: 5rem;
+            height: 2rem;
+        }
+        input {
+            width: 17rem;
+            height: 1.75rem;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-areas: "main" "aside";
+            }
+            .hero-card {
+                width: 90%;
+            }
+            .login-container {
+                width: 90%;
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>PetStack Login (DEMO)</h1>
+<!-- Right side of page -->
+<div class="main">
+    <div class="login-container">
+        <h1>Sign in to your PetStack Account! (DEMO)</h1>
 
-    <div id="messageArea" style="display:none;"></div>
+        <div id="messageArea" style="display:none;"></div>
+        
+        <!-- Login -->
+        <form id="login-Form">
+            <div class="input-box">
+                <input 
+                type="email"
+                id="email" required
+                placeholder="Email">
+            </div>
+            <div class="input-box">
+                <input 
+                type="password" 
+                id="password" required
+                placeholder="Password">
+            </div>
+            <button type="submit">Login</button>
+        </form>
 
-    <form id="loginForm">
-        <label>Email:</label>
-        <input type="email" id="email" required>
-        <br><br>
+        <div class="view-all-btn">
+            <p>Don't have an account? </p>
+            <button onclick="location.href='/signup.html'">Click here to create one!</button>
+        </div>
+        
+    </div>
+</div>
 
-        <label>Password:</label>
-        <input type="password" id="password" required>
-        <br><br>
-
-        <button type="submit">Login</button>
-    </form>
-
-    <div class="view-all-btn">
-        <button onclick="location.href='/signup.html'">Create Account Instead</button>
+<!-- Left side of page -->
+<div class="aside">
+    <div class="hero-text">
+        <h1>Welcome to PetStack!</h1>
+        <p>The easiest way to keep track of your furbaby!</p>
+    </div>
+    <div class="hero-card">
+        <div class="carousel" id="carousel">
+            <div class="carousel-card"><img src="images\card1.png" alt="An activity tracker designed to help you log your pet's daily routines."></div>
+            <div class="carousel-card"><h3><img src="images\featuresCard1.png" alt="Features: Create detailed profiles. Log activities."></div>
+            <div class="carousel-card"><h3><img src="images\featuresCard2.png" alt="Features: Setup households. Invite others to share pet responsibilities!"></div>
+            <div class="carousel-card"><img src="images\about4.png" alt="About: The idea for PetStack came from our own experiences as pet owners seeking a more efficient and reliable way to coordinate pet care. Our goal was to design a tool that empowers users to divide pet responsibilities evenly, stay organized, and ensure that pets receive the attention and care they need."></div>
+        </div>
+        <div class="carousel-nav">
+            <button class="carousel-btn" onclick="scrollCarousel(-1)">◀</button>
+            <button class="carousel-btn" onclick="scrollCarousel(1)">▶</button>
+        </div>
     </div>
 </div>
 

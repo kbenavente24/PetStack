@@ -3,182 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>PetStack - Your Account</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            padding: 0;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-
-        /* Dashboard Navigation */
-        .dashboard-nav {
-            background-color: #333;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-logo {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .nav-item {
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 8px 15px;
-            border-radius: 5px;
-        }
-
-        .nav-item.active {
-            background-color: #667eea;
-        }
-
-        .header {
-            text-align: center;
-            margin: 30px 0;
-            padding: 0 20px;
-        }
-
-        .header h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .welcome-text {
-            color: #666;
-            font-size: 18px;
-        }
-
-        .content-wrapper {
-            padding: 0 20px 20px 20px;
-        }
-
-        /* Household View */
-        #householdView {
-            display: block;
-        }
-
-        .households-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .household-card {
-            width: 200px;
-            height: 200px;
-            background: white;
-            border: 2px solid #333;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .household-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            word-wrap: break-word;
-        }
-
-        /* Pet View */
-        #petView {
-            display: none;
-        }
-
-        .back-button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .household-title {
-            text-align: center;
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .pets-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .pet-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .pet-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: 3px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            color: white;
-            font-size: 48px;
-            font-weight: bold;
-        }
-
-        .pet-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 18px;
-            color: #666;
-            padding: 50px;
-        }
-
-        .error {
-            text-align: center;
-            font-size: 18px;
-            color: #d32f2f;
-            padding: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="account.css">
 </head>
 <body>
 
@@ -200,6 +25,10 @@
 
     <!-- Household View -->
     <div id="householdView">
+        <div class="households-header" id="householdsHeader" style="display: none;">
+            <button class="add-household-btn" onclick="createHousehold()">Create Household</button>
+            <button class="add-household-btn" onclick="joinHousehold()">Join Household</button>
+        </div>
         <div id="householdsContainer" class="households-container">
             <div class="loading">Loading your households...</div>
         </div>
@@ -207,69 +36,35 @@
 
     <!-- Pet View -->
     <div id="petView">
-        <button class="back-button" onclick="showHouseholds()">← Back to Households</button>
+        <div class="back-button-container">
+            <button class="back-button" onclick="showHouseholds()">← Back to Households</button>
+        </div>
         <h2 class="household-title" id="currentHouseholdName"></h2>
+        <div style="text-align: center;">
+            <div class="invite-code-section">
+                <div class="invite-code-label">Household Invite Code:</div>
+                <div class="invite-code-display" id="householdInviteCode">------</div>
+            </div>
+        </div>
+        <div class="household-actions-container" id="householdActionsContainer">
+            <!-- Leave or Delete button will be inserted here based on user role -->
+        </div>
         <div id="petsContainer" class="pets-container">
             <div class="loading">Loading pets...</div>
         </div>
     </div>
 
-        <!-- Pet View -->
-<style>
-    .activity-top-box {
-        background: #fafafa;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-    }
+    <!-- Activity View -->
+    <div id="activityView" style="display: none;">
 
-    .notes-box {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        min-height: 60px;
-        margin-bottom: 15px;
-    }
+    <button onclick="showPets()" class="back-btn" id="activityBackButton">← Back to Pets</button>
 
-    .activity-list {
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    .activity-item {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-    }
-
-    .activity-item:hover {
-        background: #f0f0f0;
-    }
-
-    .back-btn {
-        background: #ddd;
-        border: none;
-        padding: 8px 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-bottom: 15px;
-    }
-
-    .back-btn:hover {
-        background: #ccc;
-    }
-</style>
-
-</head>
-<body>
-
-<div id="activityView" style="display: none;">
-
-    <button onclick="showPets()" class="back-btn">← Back to Pets</button>
+    <button id="openAddActivityBtn"
+        class="activityBackButton"
+        style="padding: 14px 28px; font-size: 18px;"
+        onclick="openAddActivityModal()">
+  Add Activity
+</button>
 
     <h2 id="activityPetName"></h2>
 
@@ -312,7 +107,120 @@
     </div>
 </div>
 
-<script src="account.js"></script>
+<!-- Create Household Popup Dialog -->
+<div id="createHouseholdModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Create New Household</h2>
+        <div class="modal-body">
+            <div id="createMessage" class="modal-message"></div>
+            <input type="text" id="householdNameInput" class="modal-input" placeholder="Household Name">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeCreateModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitCreateHousehold()">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Join Household Popup Dialog -->
+<div id="joinHouseholdModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Join Household</h2>
+        <div class="modal-body">
+            <div id="joinMessage" class="modal-message"></div>
+            <input type="text" id="inviteCodeInput" class="modal-input" placeholder="Enter Invite Code" maxlength="8">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeJoinModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitJoinHousehold()">Join</button>
+        </div>
+    </div>
+</div>
+
+<!-- Leave Household Popup Dialog -->
+<div id="leaveHouseholdModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Leave Household</h2>
+        <div class="modal-body">
+            <div id="leaveMessage" class="modal-message"></div>
+            <p>Are you sure you want to leave this household?</p>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeLeaveModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitLeaveHousehold()">Leave</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Household Popup Dialog -->
+<div id="deleteHouseholdModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Delete Household</h2>
+        <div class="modal-body">
+            <div id="deleteMessage" class="modal-message"></div>
+            <div class="modal-warning">
+                <strong>Warning:</strong> This will permanently delete:
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>All pets in this household</li>
+                    <li>All activities for these pets</li>
+                    <li>All member associations</li>
+                </ul>
+                This action cannot be undone!
+            </div>
+            <p>Type the household name to confirm deletion:</p>
+            <input type="text" id="deleteConfirmInput" class="modal-input" placeholder="Household Name">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" style="background-color: #d32f2f;" onclick="submitDeleteHousehold()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Pet Popup Dialog -->
+<div id="addPetModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Add New Pet</h2>
+        <div class="modal-body">
+            <div id="addPetMessage" class="modal-message"></div>
+            <input type="text" id="petNameInput" class="modal-input" placeholder="Pet Name *" required>
+            <input type="text" id="petSpeciesInput" class="modal-input" placeholder="Species (e.g., Dog, Cat) *" required>
+            <select id="petGenderInput" class="modal-input">
+                <option value="Unknown">Gender: Unknown</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <input type="date" id="petBirthdateInput" class="modal-input" placeholder="Birthdate (optional)">
+            <textarea id="petNotesInput" class="modal-input" placeholder="Owner Notes (optional)" rows="3" style="resize: vertical;"></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeAddPetModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitAddPet()">Add Pet</button>
+        </div>
+    </div>
+</div>
+
+<div id="addActivityModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Add New Activity Note</h2>
+        <div class="modal-body">
+            <div id="addActivityMessage" class="modal-message"></div>
+            <input type="text" id="activityType" class="modal-input" placeholder="Activity Type" required>
+            <textarea id="activityNotes" class="modal-input" placeholder="Notes" rows="3" style="resize: vertical;"></textarea>
+        </div>
+        <div class="modal-buttons">
+    <button class="modal-btn modal-btn-secondary" onclick="closeAddActivityModal()">Cancel</button>
+    <button class="modal-btn modal-btn-primary" onclick="submitAddActivity()">Add Activity</button>
+        </div>
+    </div>
+</div>
+
+<!-- Load all JavaScript modules in correct order -->
+<script src="account/household-manager.js"></script>
+<script src="account/pet-manager.js"></script>
+<script src="account/activity-manager.js"></script>
+<script src="account/navigation.js"></script>
+<script src="account/app-init.js"></script>
 
 </body>
 </html>
