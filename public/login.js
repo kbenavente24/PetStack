@@ -24,7 +24,7 @@ form.addEventListener('submit', async (e) => {
         }
 
         if (data.success) {
-            // Redirect to account page
+            // Redirect to user dashboard page
 
             localStorage.setItem("userData", JSON.stringify(data));
 
@@ -41,4 +41,13 @@ form.addEventListener('submit', async (e) => {
 function showMessage(msg) {
     messageArea.textContent = msg;
     messageArea.style.display = 'block';
+}
+
+function scrollCarousel(direction) {
+    const carousel = document.getElementById('carousel');
+    const scrollAmount = carousel.offsetWidth;
+    carousel.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+    });
 }
