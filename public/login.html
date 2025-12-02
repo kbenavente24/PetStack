@@ -40,10 +40,14 @@
             background-color: rgb(0 151 178);
             background-image: radial-gradient(circle at 50% 100%, rgb(0 75 132), transparent);
             grid-area: aside;
-            justify-items: center;
-            align-content: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
         }
         .hero-card {
+            position: relative;
             display: grid;
             background-color: rgb(121 201 250);
             border-radius: 1rem;
@@ -53,7 +57,8 @@
             align-content: center;
             text-align: center;
             height: 70%;
-            width: 35rem;
+            width: 100%;
+            max-width: 35rem;
         }
         .hero-text {
             font-size: 22px;
@@ -74,8 +79,18 @@
         .carousel::-webkit-scrollbar {
             display: none;
         }
-        .carousel::scroll-button(right),.carousel::scroll-button(left) {
-            content: '▶';
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: -75px;
+            right: -75px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .carousel-btn {
+            pointer-events: auto;
             border: none;
             background-color: rgb(249 116 166);
             color: white;
@@ -83,19 +98,14 @@
             width: 50px;
             border-radius: 50%;
             cursor: pointer;
-            margin: 1rem;
-            position: fixed;
-            position-anchor: --carousel;
-            left: anchor(right);
-            position-area: center right;
+            font-size: 20px;
         }
-        .carousel::scroll-button(left) {
-            content: '◀';
-            position-area: center left;
+        .carousel-btn:hover {
+            background-color: rgb(211, 99, 142);
         }
-        .carousel::scroll-button(right):disabled, .carousel::scroll-button(left):disabled {
+        .carousel-btn:disabled {
             opacity: 0.5;
-            cursor: auto;
+            cursor: not-allowed;
         }
         .carousel-card {
             height: 25em;
@@ -145,6 +155,21 @@
         input {
             width: 17rem;
             height: 1.75rem;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-areas: "main" "aside";
+            }
+            .hero-card {
+                width: 90%;
+            }
+            .login-container {
+                width: 90%;
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -189,11 +214,15 @@
         <p>The easiest way to keep track of your furbaby!</p>
     </div>
     <div class="hero-card">
-        <div class="carousel">
+        <div class="carousel" id="carousel">
             <div class="carousel-card"><img src="images\card1.png" alt="An activity tracker designed to help you log your pet's daily routines."></div>
             <div class="carousel-card"><h3><img src="images\featuresCard1.png" alt="Features: Create detailed profiles. Log activities."></div>
             <div class="carousel-card"><h3><img src="images\featuresCard2.png" alt="Features: Setup households. Invite others to share pet responsibilities!"></div>
             <div class="carousel-card"><img src="images\about4.png" alt="About: The idea for PetStack came from our own experiences as pet owners seeking a more efficient and reliable way to coordinate pet care. Our goal was to design a tool that empowers users to divide pet responsibilities evenly, stay organized, and ensure that pets receive the attention and care they need."></div>
+        </div>
+        <div class="carousel-nav">
+            <button class="carousel-btn" onclick="scrollCarousel(-1)">◀</button>
+            <button class="carousel-btn" onclick="scrollCarousel(1)">▶</button>
         </div>
     </div>
 </div>
