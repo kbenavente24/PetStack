@@ -65,7 +65,7 @@ const createHousehold = async (req, res) => {
 
     const householdId = householdResult.rows[0].household_id;
 
-    // Add the creator as creator
+    // Add the creator as a member
     await pool.query(
       `INSERT INTO household_members (user_id, household_id, user_role)
        VALUES ($1, $2, $3)`,

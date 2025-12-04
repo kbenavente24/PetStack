@@ -1,7 +1,10 @@
 // Activity management functions
 
+var globalPetId = null;
+
 // Load activities for a pet
 async function getActivities(petId, fromView = null) {
+    globalPetId = petId;
     if (fromView) {
         previousView = fromView;
         // Update back button text based on where we came from
@@ -20,6 +23,75 @@ async function getActivities(petId, fromView = null) {
 
     } catch (err) {
         console.error(err);
+    }
+}
+
+function openAddActivityModal() {
+    document.getElementById('addActivityModal').classList.add('show');
+    document.getElementById('addActivityMessage').className = 'modal-message';
+    // Clear form
+    document.getElementById('activityType').value = '';
+    document.getElementById('activityNotes').value = '';
+}
+
+// Close modal
+function closeAddActivityModal() {
+    document.getElementById('addActivityModal').classList.remove('show');
+}
+
+async function submitAddActivity() {
+    const activityType = document.getElementById('activityType').value.trim();
+    const activityNotes = document.getElementById('activityNotes').value.trim();
+    const messageDiv = document.getElementById('addActivityMessage');
+
+    if (!activityType) {
+        messageDiv.textContent = "Activity type required.";
+        messageDiv.className = 'modal-message error';
+        return;
+    }
+
+    // You already have the pet loaded — stored in data[0]
+    let userData = localStorage.getItem('userData');
+    let dataInfo = JSON.parse(userData);
+    const userId = dataInfo.user.userId;
+
+    // Generate today's date/time
+    const now = new Date();
+    const activity_date = now.toISOString().slice(0, 10);  // YYYY-MM-DD
+    const activity_time = now.toTimeString().slice(0, 8);  // HH:MM:SS
+
+    try {
+        const response = await fetch('/users/createNotesAndActivities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                pet_id: globalPetId,
+                activity_type: activityType,
+                activity_date,
+                activity_time,
+                activity_notes: activityNotes
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.error) {
+            messageDiv.textContent = result.error || 'Failed to add activity';
+            messageDiv.className = 'modal-message error';
+            return;
+        }
+
+        // Close modal
+        closeAddActivityModal();
+
+        // Refresh activity list
+        getActivities(globalPetId);
+
+    } catch (err) {
+        console.error('Error adding activity:', err);
+        messageDiv.textContent = "Failed to add activity. Please try again.";
+        messageDiv.className = 'modal-message error';
     }
 }
 
