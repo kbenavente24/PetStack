@@ -205,8 +205,9 @@ async function loadAllPets() {
             name.textContent = pet.pet_name;
 
             const householdLabel = document.createElement('div');
-            householdLabel.style.fontSize = '14px';
-            householdLabel.style.color = '#666';
+            householdLabel.style.fontSize = '16px';
+            householdLabel.style.color = 'white';
+            householdLabel.style.textShadow = '3px 3px 10px rgb(0, 0, 0)';
             householdLabel.style.marginTop = '5px';
             householdLabel.textContent = pet.household_name;
 

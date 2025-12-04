@@ -13,6 +13,7 @@ const loginController = require('./controllers/login');
 const households = require('./controllers/households');
 const pets = require('./controllers/pets');
 const activities = require('./controllers/activities');
+const accountInfo = require('./controllers/account-info');
 
 // Middleware Setup
 app.use(express.json());
@@ -43,6 +44,10 @@ app.post('/pets/add', pets.addPet);
 
 // Activity routes
 app.get('/users/viewNotesAndActivities', activities.viewNotesAndActivities);
+app.post('/users/createNotesAndActivities', activities.createNotesAndActivities);
+
+// Account routes (Pattern 1 - Direct HTML Generation)
+app.get('/account/info', accountInfo.viewAccountInfo);
 
 // Start the Server
 // Define port that our server will listen on. If no port is set in the .env file, it will use 3000 by default

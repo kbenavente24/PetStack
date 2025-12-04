@@ -2,6 +2,13 @@
 
 // Navigation function
 function navigateTo(section) {
+    // If navigating to account, redirect to server-rendered page
+    if (section === 'account') {
+        const userId = dataInfo.user.userId;
+        window.location.href = `/account/info?user_id=${userId}`;
+        return;
+    }
+
     // Update active nav item
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
 
@@ -22,11 +29,6 @@ function navigateTo(section) {
         document.getElementById('allPetsView').style.display = 'block';
         document.getElementById('pageTitle').textContent = 'All Your Pets';
         loadAllPets();
-    } else if (section === 'account') {
-        document.getElementById('navAccount').classList.add('active');
-        document.getElementById('accountView').style.display = 'block';
-        document.getElementById('pageTitle').textContent = 'Account Settings';
-        displayAccountInfo();
     }
 }
 

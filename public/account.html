@@ -13,7 +13,7 @@
     <ul class="nav-menu">
         <li class="nav-item active" id="navHouseholds" onclick="navigateTo('households')">Households</li>
         <li class="nav-item" id="navPets" onclick="navigateTo('pets')">Pets</li>
-        <li class="nav-item" id="navAccount" onclick="navigateTo('account')">Account</li>
+        <li class="nav-item link-style" id="navAccount" onclick="navigateTo('account')">Account</li>
     </ul>
 </nav>
 
@@ -58,6 +58,10 @@
     <div id="activityView" style="display: none;">
 
     <button onclick="showPets()" class="back-btn" id="activityBackButton">← Back to Pets</button>
+
+    <button onclick="openAddActivityModal()" class="add-pet-btn">
+        Add Activity
+    </button>
 
     <h2 id="activityPetName"></h2>
 
@@ -189,6 +193,22 @@
         <div class="modal-buttons">
             <button class="modal-btn modal-btn-secondary" onclick="closeAddPetModal()">Cancel</button>
             <button class="modal-btn modal-btn-primary" onclick="submitAddPet()">Add Pet</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Activity Popup Dialog -->
+<div id="addActivityModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Add New Activity</h2>
+        <div class="modal-body">
+            <div id="addActivityMessage" class="modal-message"></div>
+            <input type="text" id="activityType" class="modal-input" placeholder="Activity Type (e.g., Walk, Feeding, Vet Visit) *" required>
+            <textarea id="activityNotes" class="modal-input" placeholder="Notes (optional)" rows="3" style="resize: vertical;"></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeAddActivityModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitAddActivity()">Add Activity</button>
         </div>
     </div>
 </div>
