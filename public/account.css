@@ -60,6 +60,7 @@ body {
 
 .nav-item.active {
     background-color: rgb(255 165 198);
+    color: rgb(0 75 132);
 }
 
 .nav-item.active:hover {
@@ -319,7 +320,7 @@ body {
 }
 
 .add-household-btn {
-    background-color: rgb(255 165 198);
+    background-color: rgb(0 75 132);
     color: white;
     border: none;
     padding: 12px 25px;
@@ -542,47 +543,57 @@ body {
    ACTIVITY VIEW
    ============================================ */
 .activity-top-box {
-    background: #fafafa;
+    background-color: rgb(121, 200, 250);
+    background-image: radial-gradient(circle at 60% 100%, rgba(0, 151, 178, 0.548), transparent);
     padding: 15px;
+    border: rgb(13, 66, 87) 2px solid;
     border-radius: 10px;
-    margin-bottom: 15px;
-    color: #333;
+    margin-bottom: 20px;
+    margin-top: 3px;
     text-shadow: none;
 }
 
 .activity-top-box h3 {
-    color: #333;
+    color: rgb(0, 0, 0);
     text-shadow: none;
 }
 
 .notes-box {
-    background: white;
-    border: 1px solid #ddd;
+    background-color: rgba(255, 255, 255, 0.671);
+    border: 1px solid rgb(0, 0, 0);
     border-radius: 8px;
     padding: 10px;
     min-height: 60px;
     margin-bottom: 15px;
-    color: #333;
+    color: rgb(0, 0, 0);
     text-shadow: none;
 }
 
 .activity-list {
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: rgb(13, 66, 87) 2px solid;
     border-radius: 10px;
     padding: 10px;
-    background: white;
+    margin-top: 3px;
+    background-color: rgb(121, 200, 250);
+    background-image: radial-gradient(circle at 50% 100%, rgba(0, 151, 178, 0.575), transparent);
 }
 
 .activity-item {
     padding: 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgb(13, 66, 87);
     cursor: pointer;
-    color: #333;
-    text-shadow: none;
+    color: rgb(0, 0, 0);
+    text-shadow: none; 
 }
 
 .activity-item:hover {
-    background: #f0f0f0;
+    background: #ffffff71;
+    color: black;
+}
+
+.inner-activity-text {
+    font-size:14px;
+    color: rgb(1, 61, 107);
 }

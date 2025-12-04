@@ -140,10 +140,13 @@ function displayActivity(data) {
         const item = document.createElement('div');
         item.className = 'activity-item';
 
+        // Formatted date in activities table
+        const formattedDate = act.activity_date.split("T")[0];
+
         item.innerHTML = `
             <strong>${act.activity_type}</strong>
-            <div style="font-size:13px; color:#666;">
-                ${act.activity_date} @ ${act.activity_time}
+            <div class="inner-activity-text">
+                ${formattedDate} @ ${act.activity_time}
             </div>
         `;
 
@@ -151,7 +154,7 @@ function displayActivity(data) {
         item.onclick = () => {
             document.getElementById('selectedActivity').innerHTML = `
                 <strong>${act.activity_type}</strong><br>
-                ${act.activity_date} @ ${act.activity_time}<br><br>
+                ${formattedDate} @ ${act.activity_time}<br><br>
                 ${act.activity_notes || 'No notes'}
             `;
         };
