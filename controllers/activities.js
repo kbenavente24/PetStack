@@ -33,6 +33,7 @@ const viewNotesAndActivities = async (req, res) => {
 // add activity notes
 // CREATE NOTE/ACTIVITY FUNCTION
 const createNotesAndActivities = async (req, res) => {
+  const client = await pool.connect(); // Get transactional client
   try {
     const {
       user_id,
@@ -45,12 +46,17 @@ const createNotesAndActivities = async (req, res) => {
 
     // Basic validation
     if (!user_id || !pet_id || !activity_type || !activity_date || !activity_time) {
+      client.release(); // Release the connection
       return res.status(400).json({
         error: "Missing required fields (user_id, pet_id, activity_type, activity_date, activity_time)"
       });
     }
 
-    const result = await pool.query(
+    // Start Transaction
+    await client.query("BEGIN");
+
+    // Insert activity
+    const activityResult = await client.query(
       `
         INSERT INTO "activity" 
         (user_id, pet_id, activity_type, activity_date, activity_time, activity_notes)
@@ -60,14 +66,31 @@ const createNotesAndActivities = async (req, res) => {
       [user_id, pet_id, activity_type, activity_date, activity_time, activity_notes]
     );
 
+    // If you later want to insert notes or log entries, you can add more queries here:
+    // await client.query(...)
+    // await client.query(...)
+
+    // Commit Transaction
+    await client.query("COMMIT");
+
     res.status(201).json({
       message: "Activity created successfully",
-      activity: result.rows[0]
+      activity: activityResult.rows[0]
     });
 
   } catch (err) {
-    console.error("Insert activity error:", err);
+    console.error("Transaction error:", err);
+
+    // Rollback on error
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackErr) {
+      console.error("Rollback failed:", rollbackErr);
+    }
+
     res.status(500).json({ error: "Failed to insert activity" });
+  } finally {
+    client.release(); // Always release client
   }
 };
 
