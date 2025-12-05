@@ -68,7 +68,7 @@
 </head>
 <body>
     <div class="sign-up-container">
-        <h1>PetStack Sign Up (DEMO)</h1>
+        <h1>PetStack Sign Up</h1>
 
         <!-- Message area for displaying errors and notifications -->
         <div id="messageArea" style="display: none;"></div>
@@ -98,7 +98,7 @@
 
         <!-- Display Name Section: Set display name after successful signup -->
         <div id="displayNameSection" style="display: none;">
-            <p>Welcome! Please enter your display name (what your fellow pet caretakers will see you as):</p>
+            <p>Please enter your display name (what your fellow pet caretakers will see you as):</p>
             <form id="displayNameForm">
                 <!-- Hidden field to store the user ID from the signup response -->
                 <input type="hidden" id="userId" name="user_id">
@@ -113,11 +113,10 @@
 
         <!-- Success Section: Confirmation after completing signup -->
         <div id="successSection" style="display: none;">
-            <h2>Success!</h2>
-            <p>Your profile has been saved to the database.</p>
-            <div id="userInfo"></div>
+            <h2 id="welcomeMessage">Welcome!</h2>
+            <p>You are now ready to use PetStack!</p>
             <br>
-            <button onclick="location.reload()">Create Another Account</button>
+            <button onclick="window.location.href='/login.html'">Back to Login Page</button>
         </div>
     </div>
 

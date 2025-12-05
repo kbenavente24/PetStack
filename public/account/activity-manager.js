@@ -2,6 +2,63 @@
 
 var globalPetId = null;
 
+// Format the date and time to user-friendly format
+function formatDateTime(dateStr, timeStr) {
+    try {
+        // Handle null or undefined values
+        if (!dateStr || !timeStr) {
+            return 'Date/Time unavailable';
+        }
+
+        // If dateStr includes timestamp, extract just the date part
+        if (dateStr.includes('T')) {
+            dateStr = dateStr.split('T')[0];
+        }
+
+        // If timeStr has timezone info, extract just the time part
+        if (timeStr.includes('+') || timeStr.includes('-')) {
+            timeStr = timeStr.split(/[+-]/)[0];
+        }
+
+        // Ensure timeStr is in HH:MM:SS format (add seconds if missing)
+        const timeParts = timeStr.split(':');
+        if (timeParts.length === 2) {
+            timeStr = `${timeStr}:00`;
+        }
+
+        // Combine date and time strings and create Date object
+        const date = new Date(`${dateStr}T${timeStr}`);
+
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date:', dateStr, timeStr);
+            return 'Invalid date';
+        }
+
+        // Format date
+        const dateOptions = {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        };
+
+        // Format time
+        const timeOptions = {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        };
+
+        const formattedDate = date.toLocaleDateString('en-US', dateOptions);
+        const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+
+        return `${formattedDate} at ${formattedTime}`;
+    } catch (error) {
+        console.error('Error formatting date/time:', error, 'dateStr:', dateStr, 'timeStr:', timeStr);
+        return 'Format error';
+    }
+}
+
 // Load activities for a pet
 async function getActivities(petId, fromView = null) {
     globalPetId = petId;
@@ -61,7 +118,7 @@ async function submitAddActivity() {
     const activity_time = now.toTimeString().slice(0, 8);  // HH:MM:SS
 
     try {
-        const response = await fetch('/users/createNotesAndActivities', {
+        const response = await fetch('/users/addActivity', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -128,7 +185,7 @@ function displayActivity(data) {
     const latestActivity = data[0];
     document.getElementById('selectedActivity').innerHTML = `
         <strong>${latestActivity.activity_type}</strong><br>
-        ${latestActivity.activity_date} @ ${latestActivity.activity_time}<br><br>
+        ${formatDateTime(latestActivity.activity_date, latestActivity.activity_time)}<br><br>
         ${latestActivity.activity_notes || 'No notes'}
     `;
 
@@ -136,14 +193,14 @@ function displayActivity(data) {
     const listContainer = document.getElementById('activityList');
     listContainer.innerHTML = '';
 
-    data.forEach((act, index) => {
+    data.forEach((act) => {
         const item = document.createElement('div');
         item.className = 'activity-item';
 
         item.innerHTML = `
             <strong>${act.activity_type}</strong>
-            <div style="font-size:13px; color:#666;">
-                ${act.activity_date} @ ${act.activity_time}
+            <div class="inner-activity-text">
+                ${formatDateTime(act.activity_date, act.activity_time)}
             </div>
         `;
 
@@ -151,11 +208,77 @@ function displayActivity(data) {
         item.onclick = () => {
             document.getElementById('selectedActivity').innerHTML = `
                 <strong>${act.activity_type}</strong><br>
-                ${act.activity_date} @ ${act.activity_time}<br><br>
+                ${formatDateTime(act.activity_date, act.activity_time)}<br><br>
                 ${act.activity_notes || 'No notes'}
             `;
         };
 
         listContainer.appendChild(item);
     });
+}
+
+// Open last activity search modal
+function openLastActivityModal() {
+    document.getElementById('lastActivityModal').classList.add('show');
+    document.getElementById('lastActivityMessage').className = 'modal-message';
+    document.getElementById('lastActivityMessage').textContent = 'Enter an activity type to find when it last occurred for this pet.';
+    document.getElementById('lastActivityTypeInput').value = '';
+    document.getElementById('lastActivityResultModal').innerHTML = 'Search results will appear here...';
+}
+
+// Close last activity search modal
+function closeLastActivityModal() {
+    document.getElementById('lastActivityModal').classList.remove('show');
+}
+
+// Submit last activity search
+async function submitLastActivitySearch() {
+    const activityType = document.getElementById('lastActivityTypeInput').value.trim();
+    const resultDiv = document.getElementById('lastActivityResultModal');
+    const messageDiv = document.getElementById('lastActivityMessage');
+
+    if (!activityType) {
+        messageDiv.textContent = 'Please enter an activity type.';
+        messageDiv.className = 'modal-message error';
+        return;
+    }
+
+    if (!globalPetId) {
+        messageDiv.textContent = 'No pet selected.';
+        messageDiv.className = 'modal-message error';
+        return;
+    }
+
+    // Reset message
+    messageDiv.className = 'modal-message';
+    messageDiv.textContent = 'Searching...';
+
+    try {
+        const response = await fetch(`/activities/last?pet_id=${globalPetId}&activity_type=${encodeURIComponent(activityType)}`);
+        const result = await response.json();
+
+        if (!response.ok || result.error) {
+            messageDiv.textContent = result.error || 'Activity not found';
+            messageDiv.className = 'modal-message error';
+            resultDiv.innerHTML = `<span style="color: rgb(255 165 198);">No ${activityType} activity found for this pet.</span>`;
+            return;
+        }
+
+        // Display the result
+        messageDiv.textContent = 'Search complete!';
+        messageDiv.className = 'modal-message';
+        resultDiv.innerHTML = `
+            <strong style="font-size: 18px;">Last ${activityType}:</strong><br><br>
+            <div style="font-size: 16px;">
+                 ${formatDateTime(result.activity_date, result.activity_time)}<br>
+                 Logged by: <strong>${result.user_name}</strong>
+            </div>
+        `;
+
+    } catch (err) {
+        console.error('Error looking up last activity:', err);
+        messageDiv.textContent = 'Failed to lookup activity. Please try again.';
+        messageDiv.className = 'modal-message error';
+        resultDiv.innerHTML = '<span style="color: rgb(255 165 198);">An error occurred while searching.</span>';
+    }
 }

@@ -59,9 +59,14 @@
 
     <button onclick="showPets()" class="back-btn" id="activityBackButton">← Back to Pets</button>
 
-    <button onclick="openAddActivityModal()" class="add-pet-btn">
-        Add Activity
-    </button>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button onclick="openAddActivityModal()" class="add-pet-btn">
+            Add Activity
+        </button>
+        <button onclick="openLastActivityModal()" class="add-pet-btn">
+            Last Activity Search
+        </button>
+    </div>
 
     <h2 id="activityPetName"></h2>
 
@@ -209,6 +214,24 @@
         <div class="modal-buttons">
             <button class="modal-btn modal-btn-secondary" onclick="closeAddActivityModal()">Cancel</button>
             <button class="modal-btn modal-btn-primary" onclick="submitAddActivity()">Add Activity</button>
+        </div>
+    </div>
+</div>
+
+<!-- Last Activity Search Popup Dialog -->
+<div id="lastActivityModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header">Last Activity Search</h2>
+        <div class="modal-body">
+            <div id="lastActivityMessage" class="modal-message">Enter an activity type to find when it last occurred for this pet.</div>
+            <input type="text" id="lastActivityTypeInput" class="modal-input" placeholder="Activity Type (e.g., Walk, Feeding, Vet Visit) *" required>
+            <div id="lastActivityResultModal" style="margin-top: 20px; padding: 15px; background-color: rgba(0, 75, 132, 0.3); border-radius: 8px; min-height: 80px; color: white;">
+                Search results will appear here...
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-secondary" onclick="closeLastActivityModal()">Close</button>
+            <button class="modal-btn modal-btn-primary" onclick="submitLastActivitySearch()">Search</button>
         </div>
     </div>
 </div>

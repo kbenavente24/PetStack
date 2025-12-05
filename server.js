@@ -44,7 +44,8 @@ app.post('/pets/add', pets.addPet);
 
 // Activity routes
 app.get('/users/viewNotesAndActivities', activities.viewNotesAndActivities);
-app.post('/users/createNotesAndActivities', activities.createNotesAndActivities);
+app.post('/users/addActivity', activities.addActivity);
+app.get('/activities/last', activities.getLastActivityOfType);
 
 // Account routes (Pattern 1 - Direct HTML Generation)
 app.get('/account/info', accountInfo.viewAccountInfo);

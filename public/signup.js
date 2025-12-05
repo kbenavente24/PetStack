@@ -64,10 +64,8 @@ displayNameForm.addEventListener('submit', async (e) => {
             displayNameSection.style.display = 'none';
             successSection.style.display = 'block';
 
-            // Display the user's information
-            document.getElementById('userInfo').innerHTML = `
-                <p><strong>Display Name:</strong> ${data.user.displayName}</p>
-            `;
+            // Display personalized welcome message
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${data.user.displayName}!`;
         } else {
             // Display error message if setting display name failed
             showMessage(data.error);
