@@ -585,7 +585,7 @@ body {
     border-bottom: 1px solid rgb(13, 66, 87);
     cursor: pointer;
     color: rgb(0, 0, 0);
-    text-shadow: none; 
+    text-shadow: none;
 }
 
 .activity-item:hover {
