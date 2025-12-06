@@ -43,7 +43,8 @@ app.get('/pets/byhousehold', pets.viewPetsByHousehold);
 app.post('/pets/add', pets.addPet);
 
 // Activity routes
-app.get('/users/viewNotesAndActivities', activities.viewNotesAndActivities);
+app.get('/pets/notes', activities.viewNotes);
+app.get('/pets/activities', activities.viewActivities);
 app.post('/users/addActivity', activities.addActivity);
 app.get('/activities/last', activities.getLastActivityOfType);
 

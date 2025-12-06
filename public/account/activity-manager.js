@@ -73,10 +73,38 @@ async function getActivities(petId, fromView = null) {
         }
     }
     try {
-        const response = await fetch(`/users/viewNotesAndActivities?pet_id=${petId}`);
-        const data = await response.json();
+        // Fetch pet notes and activities separately
+        const [notesResponse, activitiesResponse] = await Promise.all([
+            fetch(`/pets/notes?pet_id=${petId}`),
+            fetch(`/pets/activities?pet_id=${petId}`)
+        ]);
 
-        displayActivity(data);
+        const petData = await notesResponse.json();
+        const activitiesData = await activitiesResponse.json();
+
+        // Combine the data in the format expected by displayActivity
+        const combinedData = activitiesData.map(activity => ({
+            ...activity,
+            pet_name: petData.pet_name,
+            owner_notes: petData.owner_notes,
+            pet_species: petData.pet_species,
+            pet_gender: petData.pet_gender,
+            pet_birthdate: petData.pet_birthdate
+        }));
+
+        // If there are no activities, create a single row with just pet data
+        if (combinedData.length === 0) {
+            combinedData.push({
+                pet_name: petData.pet_name,
+                owner_notes: petData.owner_notes,
+                pet_species: petData.pet_species,
+                pet_gender: petData.pet_gender,
+                pet_birthdate: petData.pet_birthdate,
+                activity_id: null
+            });
+        }
+
+        displayActivity(combinedData);
 
     } catch (err) {
         console.error(err);

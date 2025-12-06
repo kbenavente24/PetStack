@@ -78,8 +78,8 @@ const addActivity = async (req, res) => {
   }
 };
 
-// VIEW NOTES AND ACTIVITIES FUNCTION
-const viewNotesAndActivities = async (req, res) => {
+// VIEW NOTES FUNCTION (Retrieves pet information including owner notes)
+const viewNotes = async (req, res) => {
   try {
     const petId = req.query.pet_id;
 
@@ -89,11 +89,40 @@ const viewNotesAndActivities = async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT p.*, a.activity_id, a.user_id, a.activity_type, a.activity_date,
+      SELECT pet_id, pet_name, pet_species, pet_gender, pet_birthdate, owner_notes, household_id
+      FROM pet
+      WHERE pet_id = $1
+      `,
+      [petId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Pet not found" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Failed to load pet notes" });
+  }
+};
+
+// VIEW ACTIVITIES FUNCTION (Retrieves all activities for a pet)
+const viewActivities = async (req, res) => {
+  try {
+    const petId = req.query.pet_id;
+
+    if (!petId) {
+      return res.status(400).json({ error: "Missing pet_id" });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT a.activity_id, a.user_id, a.activity_type, a.activity_date,
              a.activity_time, a.activity_notes
-      FROM "pet" AS p
-      LEFT JOIN "activity" AS a ON a.pet_id = p.pet_id
-      WHERE p.pet_id = $1
+      FROM activity a
+      WHERE a.pet_id = $1
       ORDER BY a.activity_date DESC, a.activity_time DESC
       `,
       [petId]
@@ -107,9 +136,7 @@ const viewNotesAndActivities = async (req, res) => {
   }
 };
 
-// GET LAST ACTIVITY OF SPECIFIC TYPE (Query 10 implementation)
-// Purpose: Find out when the last time a certain pet had a specific activity
-// and who was responsible for doing it.
+// GET LAST ACTIVITY OF SPECIFIC TYPE .
 const getLastActivityOfType = async (req, res) => {
   try {
     const petId = req.query.pet_id;
@@ -158,6 +185,7 @@ const getLastActivityOfType = async (req, res) => {
 
 module.exports = {
   addActivity,
-  viewNotesAndActivities,
+  viewNotes,
+  viewActivities,
   getLastActivityOfType
 };
