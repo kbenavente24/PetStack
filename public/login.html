@@ -89,7 +89,7 @@
             justify-content: space-between;
             pointer-events: none;
         }
-        .carousel-btn {
+        .carousel-btn, .carousel-btn-right {
             pointer-events: auto;
             border: none;
             background-color: rgb(249 116 166);
@@ -99,8 +99,13 @@
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
+            padding-right: 12px;
+            padding-bottom: 3px;
         }
-        .carousel-btn:hover {
+        .carousel-btn-right {
+            padding-left: 13px;
+        }
+        .carousel-btn:hover, .carousel-btn-right:hover {
             background-color: rgb(211, 99, 142);
         }
         .carousel-btn:disabled {
@@ -216,14 +221,14 @@
     </div>
     <div class="hero-card">
         <div class="carousel" id="carousel">
-            <div class="carousel-card"><img src="images\card1.png" alt="An activity tracker designed to help you log your pet's daily routines."></div>
-            <div class="carousel-card"><h3><img src="images\featuresCard1.png" alt="Features: Create detailed profiles. Log activities."></div>
-            <div class="carousel-card"><h3><img src="images\featuresCard2.png" alt="Features: Setup households. Invite others to share pet responsibilities!"></div>
-            <div class="carousel-card"><img src="images\about4.png" alt="About: The idea for PetStack came from our own experiences as pet owners seeking a more efficient and reliable way to coordinate pet care. Our goal was to design a tool that empowers users to divide pet responsibilities evenly, stay organized, and ensure that pets receive the attention and care they need."></div>
+            <div class="carousel-card"><img src="images/card1.png" alt="An activity tracker designed to help you log your pet's daily routines."></div>
+            <div class="carousel-card"><h3><img src="images/featuresCard1.png" alt="Features: Create detailed profiles. Log activities."></div>
+            <div class="carousel-card"><h3><img src="images/featuresCard2.png" alt="Features: Setup households. Invite others to share pet responsibilities!"></div>
+            <div class="carousel-card"><img src="images/about4.png" alt="About: The idea for PetStack came from our own experiences as pet owners seeking a more efficient and reliable way to coordinate pet care. Our goal was to design a tool that empowers users to divide pet responsibilities evenly, stay organized, and ensure that pets receive the attention and care they need."></div>
         </div>
         <div class="carousel-nav">
             <button class="carousel-btn" onclick="scrollCarousel(-1)">◀</button>
-            <button class="carousel-btn" onclick="scrollCarousel(1)">▶</button>
+            <button class="carousel-btn-right" onclick="scrollCarousel(1)">▶</button>
         </div>
     </div>
 </div>
