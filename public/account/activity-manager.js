@@ -225,6 +225,9 @@ function displayActivity(data) {
         const item = document.createElement('div');
         item.className = 'activity-item';
 
+        // Formatted date in activities table
+        const formattedDate = act.activity_date.split("T")[0];
+
         item.innerHTML = `
             <strong>${act.activity_type}</strong>
             <div class="inner-activity-text">
