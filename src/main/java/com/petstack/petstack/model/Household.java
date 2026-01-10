@@ -36,13 +36,20 @@ public class Household {
     private String inviteCode;
 
     /**
-     * Many-to-Many: Household <-> User
+     * One-to-Many: Household -> HouseholdMembers
      *
-     * mappedBy = "households": This tells JPA that the User entity owns this relationship.
-     * The User class has a "households" field with @JoinTable, so we don't repeat it here.
+     * CHANGED FROM @ManyToMany!
+     *
+     * Because household_members table has user_role column,
+     * we created HouseholdMember entity to represent memberships.
+     *
+     * Now instead of "Household has many Users" (simple @ManyToMany),
+     * we have "Household has many Memberships" (each with a user and role).
+     *
+     * To get just the User objects, use getMembers() helper method below.
      */
-    @ManyToMany(mappedBy = "households")
-    private Set<User> members = new HashSet<>();
+    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<HouseholdMember> householdMemberships = new HashSet<>();
 
     // Constructors
     public Household() {
@@ -86,12 +93,26 @@ public class Household {
         this.inviteCode = inviteCode;
     }
 
-    public Set<User> getMembers() {
-        return members;
+    public Set<HouseholdMember> getHouseholdMemberships() {
+        return householdMemberships;
     }
 
-    public void setMembers(Set<User> members) {
-        this.members = members;
+    public void setHouseholdMemberships(Set<HouseholdMember> householdMemberships) {
+        this.householdMemberships = householdMemberships;
+    }
+
+    /**
+     * Convenience method: Get just the User objects (without membership details)
+     *
+     * This extracts the User from each HouseholdMember.
+     * Useful when you don't care about the user_role.
+     */
+    public Set<User> getMembers() {
+        Set<User> members = new HashSet<>();
+        for (HouseholdMember membership : householdMemberships) {
+            members.add(membership.getUser());
+        }
+        return members;
     }
 
     @Override

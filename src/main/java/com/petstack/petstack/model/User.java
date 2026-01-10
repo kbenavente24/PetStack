@@ -47,22 +47,20 @@ public class User {
     // ============ RELATIONSHIPS ============
 
     /**
-     * Many-to-Many: User <-> Household
+     * One-to-Many: User -> HouseholdMembers
      *
-     * Why HashSet?
-     * - A user can belong to multiple households
-     * - We don't want duplicate households (Set prevents this)
-     * - Order doesn't matter (Hash is faster than TreeSet when order isn't needed)
+     * CHANGED FROM @ManyToMany!
      *
-     * @JoinTable maps to the "household_members" junction table
+     * Why? Because household_members table has extra data (user_role),
+     * we created a HouseholdMember entity to represent it.
+     *
+     * Now instead of "User has many Households" (simple @ManyToMany),
+     * we have "User has many HouseholdMemberships" (each with a role).
+     *
+     * To get the actual households, use getHouseholds() helper method below.
      */
-    @ManyToMany
-    @JoinTable(
-        name = "household_members",  // The junction table name
-        joinColumns = @JoinColumn(name = "user_id"),  // This entity's foreign key column
-        inverseJoinColumns = @JoinColumn(name = "household_id")  // Other entity's foreign key column
-    )
-    private Set<Household> households = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<HouseholdMember> householdMemberships = new HashSet<>();
 
     /**
      * Many-to-Many: User <-> Pet
@@ -151,12 +149,26 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    public Set<Household> getHouseholds() {
-        return households;
+    public Set<HouseholdMember> getHouseholdMemberships() {
+        return householdMemberships;
     }
 
-    public void setHouseholds(Set<Household> households) {
-        this.households = households;
+    public void setHouseholdMemberships(Set<HouseholdMember> householdMemberships) {
+        this.householdMemberships = householdMemberships;
+    }
+
+    /**
+     * Convenience method: Get just the Household objects (without membership details)
+     *
+     * This extracts the Household from each HouseholdMember.
+     * Useful when you don't care about the user_role.
+     */
+    public Set<Household> getHouseholds() {
+        Set<Household> households = new HashSet<>();
+        for (HouseholdMember membership : householdMemberships) {
+            households.add(membership.getHousehold());
+        }
+        return households;
     }
 
     public Set<Pet> getPets() {
@@ -178,20 +190,31 @@ public class User {
     // ============ HELPER METHODS ============
 
     /**
-     * Helper method to add a household while maintaining both sides of the relationship
+     * Helper method to add a household membership with a role
      *
-     * In a many-to-many relationship, BOTH sides need to know about each other:
-     * - This user's households set needs the household
-     * - That household's members set needs this user
+     * CHANGED FROM OLD addHousehold() method!
+     *
+     * Now we need to specify the role when adding a household.
+     * This creates a HouseholdMember entity with the role.
+     */
+    public void addHouseholdMembership(Household household, String role) {
+        HouseholdMember membership = new HouseholdMember(this, household, role);
+        this.householdMemberships.add(membership);
+        household.getHouseholdMemberships().add(membership);
+    }
+
+    /**
+     * Convenience method: Add household with default "member" role
      */
     public void addHousehold(Household household) {
-        this.households.add(household);
-        household.getMembers().add(this);
+        addHouseholdMembership(household, "member");
     }
 
     public void removeHousehold(Household household) {
-        this.households.remove(household);
-        household.getMembers().remove(this);
+        // Find the membership for this household
+        householdMemberships.removeIf(membership ->
+            membership.getHousehold().equals(household)
+        );
     }
 
     /**
