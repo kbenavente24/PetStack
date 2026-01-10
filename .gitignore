@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Personal Documentation ###
+JPA_GUIDE.md
+KEY_CONCEPTS.md
+PetShare_Schema.png
+PetStack_Schema_v1.1.png
