@@ -47,10 +47,10 @@ public class Activity {
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
-    @NotBlank(message = "Activity type is required")
-    @Size(max = 50, message = "Activity type must not exceed 50 characters")
+    @NotNull(message = "Activity type is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "activity_type", nullable = false, length = 50)
-    private String activityType;
+    private ActivityType activityType;
 
     @NotNull(message = "Activity date is required")
     @Column(name = "activity_date", nullable = false)
@@ -74,7 +74,7 @@ public class Activity {
     /**
      * Constructor for creating a new activity
      */
-    public Activity(User user, Pet pet, String activityType, LocalDate activityDate, LocalTime activityTime) {
+    public Activity(User user, Pet pet, ActivityType activityType, LocalDate activityDate, LocalTime activityTime) {
         this.user = user;
         this.pet = pet;
         this.activityType = activityType;
@@ -108,11 +108,11 @@ public class Activity {
         this.pet = pet;
     }
 
-    public String getActivityType() {
+    public ActivityType getActivityType() {
         return activityType;
     }
 
-    public void setActivityType(String activityType) {
+    public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
     }
 
