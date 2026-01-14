@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PetStack</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1 class="dashboard-logo">PetStack</h1>
+    </header>
+
+    <main class="dashboard-main">
+        <h2 class="welcome-message">Welcome, <span id="user-display-name">Friend</span>!</h2>
+
+        <!-- Empty state: shown when user has no pets or households -->
+        <section id="empty-state" class="empty-state">
+            <p class="empty-state-message">Looks like you're just getting started. What would you like to do first?</p>
+
+            <div class="action-cards">
+                <button class="action-card" id="btn-add-pet">
+                    <span class="action-icon">🐾</span>
+                    <span class="action-title">Add Your Pet</span>
+                    <span class="action-desc">Start tracking activities for your furry friend</span>
+                </button>
+
+                <button class="action-card" id="btn-create-household">
+                    <span class="action-icon">🏠</span>
+                    <span class="action-title">Create a Household</span>
+                    <span class="action-desc">Set up a space to share pet care with others</span>
+                </button>
+
+                <button class="action-card" id="btn-join-household">
+                    <span class="action-icon">🤝</span>
+                    <span class="action-title">Join a Household</span>
+                    <span class="action-desc">Enter an invite code to join an existing group</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Active state: shown when user has pets/households (hidden by default) -->
+        <section id="active-state" class="active-state" style="display: none;">
+            <!-- This will be populated later when you build out the main dashboard -->
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
