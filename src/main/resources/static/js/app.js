@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up form handlers based on which page we're on
     setupSignupForm();
     setupLoginForm();
+    setupDashboard();
 });
 
 /**
@@ -49,7 +50,7 @@ function setupSignupForm() {
         try {
             // Send the data to your backend API
             // This must match what your Spring controller expects
-            const user = await apiCall('/api/users', {
+            const user = await apiCall('/api/auth/signup', {
                 method: 'POST',
                 body: JSON.stringify({
                     email: email,
@@ -89,9 +90,6 @@ function setupLoginForm() {
         const password = document.getElementById('password').value;
 
         try {
-            // TODO: This endpoint doesn't exist yet!
-            // You'll need to create a login endpoint in your Spring Boot backend
-            // that verifies the email/password and returns user info + session token
             const response = await apiCall('/api/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -102,8 +100,12 @@ function setupLoginForm() {
 
             console.log('Login successful:', response);
 
+            // Store user info in localStorage so we know who's logged in
+            // localStorage persists even if you close the browser
+            localStorage.setItem('userId', response.userId);
+            localStorage.setItem('displayName', response.displayName);
+
             // After successful login, redirect to the main app
-            // For now, we don't have a dashboard, so this is a placeholder
             window.location.href = '/dashboard.html';
 
         } catch (error) {
@@ -111,6 +113,66 @@ function setupLoginForm() {
             console.error('Login error:', error);
         }
     });
+}
+
+/**
+ * Sets up the dashboard page
+ * Checks if user is logged in, displays their info, loads their pets
+ */
+async function setupDashboard() {
+    // Check if we're on the dashboard page
+    const displayNameElement = document.getElementById('user-display-name');
+
+    if (!displayNameElement) return;  // Not on dashboard, do nothing
+
+    // Check if user is logged in by looking for userId in localStorage
+    const userId = localStorage.getItem('userId');
+    const displayName = localStorage.getItem('displayName');
+
+    if (!userId) {
+        // Not logged in - redirect to login page
+        window.location.href = '/login.html';
+        return;
+    }
+
+    // User is logged in - show their name
+    displayNameElement.textContent = displayName;
+
+    // Load the user's pets
+    try {
+        const pets = await apiCall(`/api/pets/user/${userId}`);
+        console.log('User pets:', pets);
+
+        // If user has pets, show them; otherwise show empty state
+        if (pets.length > 0) {
+            displayPets(pets);
+        }
+    } catch (error) {
+        console.error('Failed to load pets:', error);
+    }
+}
+
+/**
+ * Displays the user's pets on the dashboard
+ */
+function displayPets(pets) {
+    // Hide empty state, show active state
+    const emptyState = document.getElementById('empty-state');
+    const activeState = document.getElementById('active-state');
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (activeState) {
+        activeState.style.display = 'block';
+
+        // Build HTML for each pet
+        let petsHtml = '<h3>Your Pets</h3><ul class="pets-list">';
+        for (const pet of pets) {
+            petsHtml += `<li class="pet-item">${pet.petName}</li>`;
+        }
+        petsHtml += '</ul>';
+
+        activeState.innerHTML = petsHtml;
+    }
 }
 
 /**

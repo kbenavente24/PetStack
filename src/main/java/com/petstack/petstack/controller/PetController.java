@@ -1,8 +1,11 @@
 package com.petstack.petstack.controller;
 
+import com.petstack.petstack.dto.response.PetResponse;
 import com.petstack.petstack.model.Pet;
 import com.petstack.petstack.service.PetService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -35,6 +38,12 @@ public class PetController {
     @DeleteMapping("/{petId}")
     public void deletePet(@PathVariable Integer petId){
         petService.deletePet(petId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<PetResponse> getPetsByUser(@PathVariable Integer userId) {
+        List<Pet> pets = petService.getPetsByUserId(userId);
+        return pets.stream().map(pet -> new PetResponse(pet)).toList();
     }
 
 }
