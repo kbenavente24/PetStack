@@ -175,4 +175,33 @@ public class Pet {
                 ", petSpecies='" + petSpecies + '\'' +
                 '}';
     }
+
+    /**
+     * LEARNING NOTE: equals() and hashCode() for JPA entities
+     *
+     * equals() determines if two Pet objects represent the same entity.
+     * We compare by petId (primary key) - if two Pets have the same petId, they're equal.
+     *
+     * hashCode() returns a constant (31) instead of using petId. Why?
+     * - petId is null before the entity is saved to the database
+     * - If hashCode used petId, it would change after saving
+     * - HashSets store objects in "buckets" based on hashCode
+     * - If hashCode changes, the object is in the wrong bucket and becomes "lost"
+     * - Constant hashCode = slower (all Pets in one bucket) but always correct
+     *
+     * Contract: if equals() returns true, hashCode() MUST return the same value.
+     * But same hashCode does NOT mean equals() is true (multiple objects can share a bucket).
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pet pet = (Pet) o;
+        return petId != null && petId.equals(pet.petId);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 }

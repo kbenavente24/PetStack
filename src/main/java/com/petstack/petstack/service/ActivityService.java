@@ -7,8 +7,11 @@ import com.petstack.petstack.repository.ActivityRepository;
 import com.petstack.petstack.repository.UserRepository;
 import com.petstack.petstack.repository.PetRepository;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 @Service
@@ -34,5 +37,16 @@ public class ActivityService {
 
         activityRepository.save(activity);
 
+    }
+
+    public List<Activity> getActivitiesForSpecificDate(Date date, Integer userId, Integer petId){
+        User user =  userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+        Pet pet =  petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found!"));
+
+        if(!user.getPets().contains(pet)){
+            throw new RuntimeException("Pet for user not found!");
+        }
+
+        return new ArrayList<>(pet.getActivities());
     }
 }
