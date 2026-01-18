@@ -13,17 +13,19 @@ public class ActivityResponse {
     private String activityNotes;
     // NOT including owners or activities - breaks the cycle!
 
-    // Constructor takes PET, not User
     public ActivityResponse(Activity activity) {
         this.petName = activity.getPet().getPetName();
         // ask claude about this
-        this.activityType = activity.getActivityType(); 
+        this.activityType = activity.getActivityType().name(); 
+        this.activityDate = activity.getActivityDate();
+        this.activityTime = activity.getActivityTime();
+        this.activityNotes = activity.getActivityNotes();
     }
 
     // Getters
-    public Integer getPetId() { return petId; }
     public String getPetName() { return petName; }
-    public LocalDate getPetBirthdate() { return petBirthdate; }
-    public String getPetSpecies() { return petSpecies; }
-    public String getPetGender() { return petGender; }    
+    public String getActivityType() { return activityType; } 
+    public LocalDate getActivityDate() { return activityDate; }
+    public LocalTime getActivityTime() { return activityTime; }
+    public String getActivityNotes() { return activityNotes; }
 }

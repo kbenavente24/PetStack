@@ -1,11 +1,13 @@
 package com.petstack.petstack.controller;
 
+import com.petstack.petstack.dto.response.ActivityResponse;
 import com.petstack.petstack.model.Activity;
 import com.petstack.petstack.model.ActivityType;
 import com.petstack.petstack.service.ActivityService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,13 @@ public class ActivityController {
             request.getActivityDate(),
             request.getActivityTime()
         );
+    }
+
+    @GetMapping("/pet")
+    public List<ActivityResponse> getActivities(@RequestParam LocalDate date, @RequestParam Integer userId, @RequestParam Integer petId){
+        List<Activity> activities = activityService.getActivitiesForSpecificDate(date, userId, petId);
+
+        return activities.stream().map(activity -> new ActivityResponse(activity)).toList();
     }
     
     // Inner class to represent the incoming JSON request

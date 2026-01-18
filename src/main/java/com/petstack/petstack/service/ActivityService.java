@@ -7,7 +7,6 @@ import com.petstack.petstack.repository.ActivityRepository;
 import com.petstack.petstack.repository.UserRepository;
 import com.petstack.petstack.repository.PetRepository;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -39,14 +38,17 @@ public class ActivityService {
 
     }
 
-    public List<Activity> getActivitiesForSpecificDate(Date date, Integer userId, Integer petId){
+    public List<Activity> getActivitiesForSpecificDate(LocalDate date, Integer userId, Integer petId){
         User user =  userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
         Pet pet =  petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found!"));
 
+        // TODO: Optimization - This ownership check triggers a lazy load of user's entire pets collection (extra DB query).
+        // Consider replacing with: petRepository.existsByPetIdAndOwnersUserId(petId, userId)
+        // which does a single efficient EXISTS query instead of loading all pet objects.
         if(!user.getPets().contains(pet)){
             throw new RuntimeException("Pet for user not found!");
         }
 
-        return new ArrayList<>(pet.getActivities());
+        return new ArrayList<>(activityRepository.findByActivityDateAndUserUserIdAndPetPetId(date, userId, petId));
     }
 }
