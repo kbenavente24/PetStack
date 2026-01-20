@@ -8,6 +8,7 @@ import com.petstack.petstack.model.Activity;
 public class ActivityResponse {
     private String activityType;
     private String petName;
+    private String loggedByName;
     private LocalDate activityDate;
     private LocalTime activityTime;
     private String activityNotes;
@@ -17,6 +18,7 @@ public class ActivityResponse {
         this.petName = activity.getPet().getPetName();
         // ask claude about this
         this.activityType = activity.getActivityType().name(); 
+        this.loggedByName = activity.getUser().getDisplayName();
         this.activityDate = activity.getActivityDate();
         this.activityTime = activity.getActivityTime();
         this.activityNotes = activity.getActivityNotes();
@@ -25,6 +27,7 @@ public class ActivityResponse {
     // Getters
     public String getPetName() { return petName; }
     public String getActivityType() { return activityType; } 
+    public String getLoggedByName() { return loggedByName; }
     public LocalDate getActivityDate() { return activityDate; }
     public LocalTime getActivityTime() { return activityTime; }
     public String getActivityNotes() { return activityNotes; }

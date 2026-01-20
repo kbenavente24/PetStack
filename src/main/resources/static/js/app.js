@@ -122,8 +122,11 @@ function setupLoginForm() {
 async function setupDashboard() {
     // Check if we're on the dashboard page
     const displayNameElement = document.getElementById('user-display-name');
+    
 
     if (!displayNameElement) return;  // Not on dashboard, do nothing
+
+    setupActivityButtons();
 
     // Check if user is logged in by looking for userId in localStorage
     const userId = localStorage.getItem('userId');
@@ -137,19 +140,56 @@ async function setupDashboard() {
 
     // User is logged in - show their name
     displayNameElement.textContent = displayName;
+    
 
     // Load the user's pets
     try {
+        const today = new Date();
+        const date = today.toISOString().split('T')[0];  // "2026-01-19"    
         const pets = await apiCall(`/api/pets/user/${userId}`);
-        console.log('User pets:', pets);
-
+        const activities = await apiCall(`/api/activity/pet?date=${date}&userId=${userId}&petId=${pets[0].petId}`);
         // If user has pets, show them; otherwise show empty state
         if (pets.length > 0) {
+            console.log(activities);
             displayPets(pets);
+            displayActivityLog(activities);
+            localStorage.setItem('petId', pets[0].petId);
         }
+
     } catch (error) {
         console.error('Failed to load pets:', error);
     }
+}
+
+function setupActivityButtons() {
+    const buttons = document.querySelectorAll('.activity-btn');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const activityType = button.dataset.type;  // reads data-type attribute
+            logActivity(activityType);
+        });
+    });
+}
+
+async function logActivity(activityType){
+    const userId = localStorage.getItem('userId');
+    const petId = localStorage.getItem('petId');
+    const today = new Date();
+    const todaysDate = today.toISOString().split('T')[0];
+    const todaysTime = today.toTimeString().split(' ')[0];  // "14:30:45"
+    await apiCall(`/api/activity`, {
+        method: 'POST',
+        body: JSON.stringify({
+            userId: userId,
+            petId: petId,
+            activityType: activityType,
+            activityDate: todaysDate,
+            activityTime: todaysTime,
+        })
+    } );
+    const activities = await apiCall(`/api/activity/pet?date=${todaysDate}&userId=${userId}&petId=${petId}`);
+    displayActivityLog(activities);
 }
 
 /**
@@ -162,18 +202,28 @@ function displayPets(pets) {
 
     if (emptyState) emptyState.style.display = 'none';
     if (activeState) {
-        activeState.style.display = 'block';
+        activeState.classList.remove('hidden');
+    }
 
-        // Build HTML for each pet
-        let petsHtml = '<h3>Your Pets</h3><ul class="pets-list">';
-        for (const pet of pets) {
-            petsHtml += `<li class="pet-item">${pet.petName}</li>`;
-        }
-        petsHtml += '</ul>';
+    const petDropdown = document.getElementById('pet-dropdown');
+    const option = document.createElement('option');
+    option.textContent = pets[0].petName;
+    petDropdown.appendChild(option);
 
-        activeState.innerHTML = petsHtml;
+}
+
+function displayActivityLog(activities){
+    const activityLog = document.getElementById('activity-log');
+    activityLog.innerHTML = '';
+    for(const activity of activities){
+    const log = document.createElement('li');
+    log.className = 'activity-entry';  
+    log.textContent = `${activity.petName} was ${activity.activityType} with ${activity.loggedByName} @ ${activity.activityTime}`
+    activityLog.append(log);
     }
 }
+
+
 
 /**
  * Helper function to make API calls to your backend

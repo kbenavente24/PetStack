@@ -26,7 +26,7 @@ public class ActivityService {
         this.petRepository = petRepository;
     }
 
-    public void logActivity(Integer userId, Integer petId, ActivityType activityType, LocalDate activityDate, LocalTime activityTime){
+    public Activity logActivity(Integer userId, Integer petId, ActivityType activityType, LocalDate activityDate, LocalTime activityTime){
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
 
@@ -35,6 +35,8 @@ public class ActivityService {
         Activity activity = new Activity(user, pet, activityType, activityDate, activityTime);
 
         activityRepository.save(activity);
+
+        return activity;
 
     }
 
@@ -49,6 +51,6 @@ public class ActivityService {
             throw new RuntimeException("Pet for user not found!");
         }
 
-        return new ArrayList<>(activityRepository.findByActivityDateAndUserUserIdAndPetPetId(date, userId, petId));
+        return activityRepository.findByActivityDateAndUserUserIdAndPetPetId(date, userId, petId);
     }
 }

@@ -23,18 +23,19 @@ public class ActivityController {
     }
 
     @PostMapping
-    public void logActivity(@RequestBody CreateActivityRequest request) {
-        activityService.logActivity(
+    public ActivityResponse logActivity(@RequestBody CreateActivityRequest request) {
+        Activity activity = activityService.logActivity(
             request.getUserId(),
             request.getPetId(),
             request.getActivityType(),
             request.getActivityDate(),
             request.getActivityTime()
         );
+        return new ActivityResponse(activity);
     }
 
     @GetMapping("/pet")
-    public List<ActivityResponse> getActivities(@RequestParam LocalDate date, @RequestParam Integer userId, @RequestParam Integer petId){
+    public List<ActivityResponse> getActivitiesForPet(@RequestParam LocalDate date, @RequestParam Integer userId, @RequestParam Integer petId){
         List<Activity> activities = activityService.getActivitiesForSpecificDate(date, userId, petId);
 
         return activities.stream().map(activity -> new ActivityResponse(activity)).toList();

@@ -13,7 +13,7 @@
     <!-- Your CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class = "dashboard-body">
     <header class="dashboard-header">
         <h1 class="dashboard-logo">PetStack</h1>
     </header>
@@ -47,8 +47,20 @@
         </section>
 
         <!-- Active state: shown when user has pets/households (hidden by default) -->
-        <section id="active-state" class="active-state" style="display: none;">
-            <!-- This will be populated later when you build out the main dashboard -->
+        <section id="active-state" class="active-state hidden">
+
+            <select class = "pet-dropdown" id = "pet-dropdown"></select>
+
+            <div class="activity-buttons">
+                <button class = "activity-btn" data-type="FED">Fed</button>
+                <button class = "activity-btn" data-type="WALKED">Walked</button>
+                <button class = "activity-btn" data-type="PEE">Pee</button>
+                <button class = "activity-btn" data-type="POOP">Poop</button>
+            </div>
+
+            <ul class="activity-log" id="activity-log">
+
+            </ul>
         </section>
     </main>
 
