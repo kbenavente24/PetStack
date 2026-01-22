@@ -27,9 +27,7 @@ public class HouseholdMemberService {
 
         Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Household not found!"));
 
-        String tempRole = role;
-
-        HouseholdMember member = new HouseholdMember(user, household, tempRole);
+        HouseholdMember member = new HouseholdMember(user, household, role);
 
         householdMemberRepository.save(member);
         

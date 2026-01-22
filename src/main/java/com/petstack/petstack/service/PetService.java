@@ -23,9 +23,14 @@ public class PetService {
         this.userRepository = userRepository;
     }
 
-    public Pet createPet(String petName){
+    public Pet createPet(String petName, Integer userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Error getting user"));
         Pet pet = new Pet(petName);
-        petRepository.save(pet);
+        pet.getOwners().add(user);
+        user.getPets().add(pet);      // This is the owning side
+    
+        petRepository.save(pet);       // Save the pet first (so it gets an ID)
+        userRepository.save(user);     // Save user to persist the junction table entry
         return pet;
     }
 

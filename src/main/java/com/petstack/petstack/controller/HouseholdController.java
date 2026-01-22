@@ -3,6 +3,8 @@ package com.petstack.petstack.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.petstack.petstack.dto.response.HouseholdResponse;
+import com.petstack.petstack.model.Household;
 import com.petstack.petstack.service.HouseholdService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,14 +21,16 @@ public class HouseholdController {
     }
 
     @PostMapping
-    public void createHousehold(@RequestBody CreateHouseholdRequest request) {
-        householdService.createHousehold(request.getUserId(), request.getHouseholdName());
+    public HouseholdResponse createHousehold(@RequestBody CreateHouseholdRequest request) {
+        Household household = householdService.createHousehold(request.getUserId(), request.getHouseholdName(), request.getRole());
         
+        return new HouseholdResponse(household);
     }
 
     public static class CreateHouseholdRequest{
         private Integer userId;
         private String householdName;
+        private String role;
 
         public Integer getUserId(){
             return userId;
@@ -41,6 +45,13 @@ public class HouseholdController {
 
         public void setHouseholdName(String householdName){
             this.householdName = householdName;
+        }
+
+        public String getRole(){
+            return role;
+        }
+        public void setRole(String role){
+            this.role = role;
         }
 
     }

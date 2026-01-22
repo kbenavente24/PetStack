@@ -124,9 +124,13 @@ async function setupDashboard() {
     const displayNameElement = document.getElementById('user-display-name');
     
 
-    if (!displayNameElement) return;  // Not on dashboard, do nothing
+    if (!displayNameElement){
+        return;
+    }  // Not on dashboard, do nothing
 
     setupActivityButtons();
+    setupAddPetModal();
+    setupCreateHouseholdModal();
 
     // Check if user is logged in by looking for userId in localStorage
     const userId = localStorage.getItem('userId');
@@ -147,19 +151,149 @@ async function setupDashboard() {
         const today = new Date();
         const date = today.toISOString().split('T')[0];  // "2026-01-19"    
         const pets = await apiCall(`/api/pets/user/${userId}`);
-        const activities = await apiCall(`/api/activity/pet?date=${date}&userId=${userId}&petId=${pets[0].petId}`);
         // If user has pets, show them; otherwise show empty state
+        console.log("hi");
         if (pets.length > 0) {
+            const activities = await apiCall(`/api/activity/pet?date=${date}&userId=${userId}&petId=${pets[0].petId}`);
             console.log(activities);
             displayPets(pets);
             displayActivityLog(activities);
             localStorage.setItem('petId', pets[0].petId);
         }
-
     } catch (error) {
         console.error('Failed to load pets:', error);
     }
 }
+
+function setupAddPetModal(){
+    const addPetButton = document.getElementById('btn-add-pet');
+    addPetButton.addEventListener('click', e => {
+        openModal('add-pet');
+        setupAddPet();
+    } )
+}
+
+function setupAddPet(){
+    const form = document.getElementById('add-pet-form');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(form));
+        data.userId = localStorage.getItem('userId');
+        console.log(data);
+    try {
+      await apiCall('/api/pets', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+
+      openModal('first-pet-added');
+      
+      // Refresh pet list, show success, etc.
+    } catch (error) {
+      console.error('Failed to add pet:', error);
+    }
+    })
+}
+
+function setupCreateHousehold(){
+    const form = document.getElementById('create-household-form');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(form));
+        data.userId = localStorage.getItem('userId');
+        data.role = "Creator";
+    try {
+      await apiCall('/api/household', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      
+      // Refresh pet list, show success, etc.
+    } catch (error) {
+      console.error('Failed to add pet:', error);
+    }
+    })
+}
+
+function setupCreateHouseholdModal(){
+    const createHouseholdButton = document.getElementById('btn-create-household');
+    createHouseholdButton.addEventListener('click', (e) => {
+        openModal('create-household');
+        setupCreateHousehold();
+    })
+}
+
+
+
+function openModal(contentType){
+    const content = document.getElementById('modal-content');
+
+    const closeModalButton = document.getElementById('modal-close');
+    closeModalButton.addEventListener('click', (e) => {
+    const modalOverlay = document.getElementById('modal-overlay').classList.add('hidden');
+    })
+
+    if(contentType === 'add-pet'){
+    content.innerHTML = `
+      <h2 class="text-center">Pet Information</h2>
+      <p class="text-small mb-md">Before adding your pet, we'll need a bit of info!</p>
+      <form id="add-pet-form">
+        <label>Your Pet's Name</label>
+        <input type="text" name="petName" required>
+        <label>Your Pet's Breed</label>
+        <input type="text" name="petSpecies" required>
+        <label>Your Pet's Date of Birth (Optional)</label>
+        <input type="text" name="petBirthdate" required>
+        <button type="submit" class="modal-btn">Confirm</button>
+      </form>
+    `;
+
+    document.getElementById('modal-overlay').classList.remove('hidden');
+
+    }
+
+
+    if(contentType === 'first-pet-added'){
+    content.innerHTML = `
+      <h2 class="text-center">Your pet has been added!</h2>
+      <p class="text-small mb-md">What would you like to do next?</p>
+      <button type="click" id="start-logging-activities">Start logging activities></button>
+      <button type="click">Create a household and invite others></button>
+    `;
+    document.getElementById('modal-close').classList.add('hidden');
+
+    const startLoggingActivitiesBtn = document.getElementById('start-logging-activities');
+    startLoggingActivitiesBtn.addEventListener('click', async (e) => {
+        document.getElementById('modal-overlay').classList.add('hidden');
+        const userId = localStorage.getItem('userId');
+        const pets = await apiCall(`/api/pets/user/${userId}`);
+        if (pets.length > 0) {
+        displayPets(pets);
+        localStorage.setItem('petId', pets[0].petId);
+        // Load activities for today...
+            }
+        });
+    }
+
+    if(contentType === 'create-household'){
+    content.innerHTML = `
+      <h2 class="text-center">Create a Household</h2>
+      <p class="text-small mb-md">Households are groups of PetStack members that can collaboratively log activities for your pets. Once your household is created, you will be provided an invite code that you can then share with others!</p>
+      <form id="create-household-form">
+        <label>Your household's name</label>
+        <input type="text" name="householdName" required>
+        <button type="submit" class="modal-btn">Confirm</button>
+      </form>
+    `;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+}
+
 
 function setupActivityButtons() {
     const buttons = document.querySelectorAll('.activity-btn');

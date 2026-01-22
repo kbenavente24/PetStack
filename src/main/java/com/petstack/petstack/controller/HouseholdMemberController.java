@@ -25,7 +25,7 @@ public class HouseholdMemberController {
     public static class RegisterHouseholdMemberRequest {
         private Integer userId;
         private Integer householdId;
-        private String role = "TEST";
+        private String role;
 
         public Integer getUserId(){return userId;}
         public void setUserId(Integer userId){this.userId = userId;}

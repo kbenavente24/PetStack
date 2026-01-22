@@ -20,19 +20,20 @@ public class PetController {
 
     @PostMapping
     public Pet createPet(@RequestBody CreatePetRequest request) {
-        return petService.createPet(
-            request.getPetName()
-        );
+        return petService.createPet(request.getPetName(), request.getUserId());
     }
     
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package
     public static class CreatePetRequest {
         private String petName;
+        private Integer userId;
 
         // Getters and setters (required for JSON deserialization)
         public String getPetName() { return petName; }
         public void setPetName(String petName) { this.petName = petName; }
+        public Integer getUserId() { return userId; }
+        public void setUserId(Integer userId) { this.userId = userId; }
     }
 
     @DeleteMapping("/{petId}")
