@@ -1,10 +1,5 @@
-/**
+/*
  * PetStack Frontend JavaScript
- *
- * This file will handle:
- * - Fetching data from your Spring Boot API
- * - Updating the page with that data
- * - Handling user interactions (form submissions, button clicks)
  */
 
 // Wait for the page to fully load before running any JavaScript
@@ -18,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Sets up the signup form submission handler
+ * --------------SIGN UP FORM SUBMISSION HANDLER------------------
  * Only runs if the signup form exists on the current page
  */
 function setupSignupForm() {
@@ -75,7 +70,10 @@ function setupSignupForm() {
 }
 
 /**
- * Sets up the login form submission handler
+ * --------------------LOGIN FORM SUBMISSION HANDLER-----------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
  * Only runs if the login form exists on the current page
  */
 function setupLoginForm() {
@@ -105,6 +103,11 @@ function setupLoginForm() {
             localStorage.setItem('userId', response.userId);
             localStorage.setItem('displayName', response.displayName);
 
+            if(response.households.length > 0){
+                console.log("User has households in their account, adding them to local storage.");
+                localStorage.setItem('households', JSON.stringify(response.households));
+            }
+
             // After successful login, redirect to the main app
             window.location.href = '/dashboard.html';
 
@@ -116,7 +119,10 @@ function setupLoginForm() {
 }
 
 /**
- * Sets up the dashboard page
+ * -----------------------------DASHBOARD SETUP---------------------------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
  * Checks if user is logged in, displays their info, loads their pets
  */
 async function setupDashboard() {
@@ -129,12 +135,13 @@ async function setupDashboard() {
     }  // Not on dashboard, do nothing
 
     setupActivityButtons();
-    setupAddPetModal();
-    setupCreateHouseholdModal();
+    createHouseholdCardFunctionality();
+    addPetCardFunctionality();
 
     // Check if user is logged in by looking for userId in localStorage
     const userId = localStorage.getItem('userId');
     const displayName = localStorage.getItem('displayName');
+
 
     if (!userId) {
         // Not logged in - redirect to login page
@@ -144,17 +151,28 @@ async function setupDashboard() {
 
     // User is logged in - show their name
     displayNameElement.textContent = displayName;
-    
+
+    // If a user does not have any households, we do not need to proceed any further as the next
+    // lines of code within this function pertain to loading households and/or pets.
+    console.log(localStorage.getItem('households'));
+    if(localStorage.getItem('households') === null){
+        return;
+    }
+    const userHouseholds = JSON.parse(localStorage.getItem('households'));
+    const firstHouseholdId = userHouseholds[0].householdId;
+    console.log(firstHouseholdId);
+
 
     // Load the user's pets
     try {
         const today = new Date();
         const date = today.toISOString().split('T')[0];  // "2026-01-19"    
-        const pets = await apiCall(`/api/pets/user/${userId}`);
+        const pets = await apiCall(`/api/pets/${firstHouseholdId}`);
+        console.log(pets);
         // If user has pets, show them; otherwise show empty state
         console.log("hi");
         if (pets.length > 0) {
-            const activities = await apiCall(`/api/activity/pet?date=${date}&userId=${userId}&petId=${pets[0].petId}`);
+            const activities = await apiCall(`/api/activity/pet?date=${date}&householdId=${firstHouseholdId}&userId=${userId}&petId=${pets[0].petId}`);
             console.log(activities);
             displayPets(pets);
             displayActivityLog(activities);
@@ -165,15 +183,19 @@ async function setupDashboard() {
     }
 }
 
-function setupAddPetModal(){
+//------------"ADD PET" MENU CARD FUNCTIONALITY + HELPER FUNCTIONS -------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
+function addPetCardFunctionality(){
     const addPetButton = document.getElementById('btn-add-pet');
     addPetButton.addEventListener('click', e => {
         openModal('add-pet');
-        setupAddPet();
+        setUpSubmittingPetForm();
     } )
 }
 
-function setupAddPet(){
+function setUpSubmittingPetForm(){
     const form = document.getElementById('add-pet-form');
 
     form.addEventListener('submit', async (e) => {
@@ -181,6 +203,7 @@ function setupAddPet(){
 
         const data = Object.fromEntries(new FormData(form));
         data.userId = localStorage.getItem('userId');
+        data.householdId = JSON.parse(localStorage.getItem('households')).householdId;
         console.log(data);
     try {
       await apiCall('/api/pets', {
@@ -197,7 +220,21 @@ function setupAddPet(){
     })
 }
 
-function setupCreateHousehold(){
+//------------"CREATE HOUSEHOLD" MENU CARD FUNCTIONALITY + HELPER FUNCTIONS -------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
+//CARD THAT APPEARS AFTER PRESSING "CREATE A HOUSEHOLD" IN THE FIRST-TIME (EMPTY-STATE) DASHBOARD
+
+function createHouseholdCardFunctionality(){
+    const createHouseholdButton = document.getElementById('btn-create-household');
+    createHouseholdButton.addEventListener('click', (e) => {
+        openModal('create-household');
+        setUpSubmittingHouseholdForm();
+    })
+}
+
+function setUpSubmittingHouseholdForm(){
     const form = document.getElementById('create-household-form');
 
     form.addEventListener('submit', async (e) => {
@@ -207,27 +244,34 @@ function setupCreateHousehold(){
         data.userId = localStorage.getItem('userId');
         data.role = "Creator";
     try {
-      await apiCall('/api/household', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-      
-      // Refresh pet list, show success, etc.
-    } catch (error) {
-      console.error('Failed to add pet:', error);
-    }
-    })
-}
+        const household = await apiCall('/api/household', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
 
-function setupCreateHouseholdModal(){
-    const createHouseholdButton = document.getElementById('btn-create-household');
-    createHouseholdButton.addEventListener('click', (e) => {
-        openModal('create-household');
-        setupCreateHousehold();
-    })
+        localStorage.setItem('households', JSON.stringify(household));
+        console.log(JSON.parse(localStorage.getItem('households')));
+        //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
+        document.getElementById('modal-overlay').classList.add('hidden');
+        openModal('first-time-household-creation');
+    
+        } catch (error) {
+            console.error('Failed to :', error);
+        }
+    });
 }
 
 
+
+
+/**
+ * -----------------------------MODAL CONTROL---------------------------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
+ * THIS DISPLAYS THE VARYING STATES OF THE DASHBOARD. THE PARAMETER "contentType" IS
+// USED TO DETERMINE WHAT TO DISPLAY/HIDE/UNHIDE
+ */
 
 function openModal(contentType){
     const content = document.getElementById('modal-content');
@@ -262,7 +306,7 @@ function openModal(contentType){
       <h2 class="text-center">Your pet has been added!</h2>
       <p class="text-small mb-md">What would you like to do next?</p>
       <button type="click" id="start-logging-activities">Start logging activities></button>
-      <button type="click">Create a household and invite others></button>
+      <button type="click">Invite others></button>
     `;
     document.getElementById('modal-close').classList.add('hidden');
 
@@ -270,7 +314,8 @@ function openModal(contentType){
     startLoggingActivitiesBtn.addEventListener('click', async (e) => {
         document.getElementById('modal-overlay').classList.add('hidden');
         const userId = localStorage.getItem('userId');
-        const pets = await apiCall(`/api/pets/user/${userId}`);
+        const householdId = JSON.parse(localStorage.getItem('households')).householdId;
+        const pets = await apiCall(`/api/pets/${householdId}`);
         if (pets.length > 0) {
         displayPets(pets);
         localStorage.setItem('petId', pets[0].petId);
@@ -292,8 +337,28 @@ function openModal(contentType){
     document.getElementById('modal-overlay').classList.remove('hidden');
     }
 
+    if(contentType === 'first-time-household-creation'){
+        const topPageGreeting = document.getElementById('welcome-message');
+        topPageGreeting.textContent = JSON.parse(localStorage.getItem('households')).householdName;
+        const firstHouseholdMessage = document.getElementById('empty-state-message');
+        firstHouseholdMessage.textContent = "Now that you've created a household, it's time to add a pet. From there, you could either begin stacking or invite friends and family to your household!";
+        document.getElementById('btn-add-pet').classList.remove('hidden');
+        document.getElementById('btn-create-household').classList.add('hidden');
+        document.getElementById('btn-join-household').classList.add('hidden');
+
+        
+    }
+
 }
 
+
+/**
+ * ---------------------ACTIVITY LOG + PET DROPDOWN MENU------------------------------
+//************************************************************************************
+//************************************************************************************
+//************************************************************************************
+ * 
+ */
 
 function setupActivityButtons() {
     const buttons = document.querySelectorAll('.activity-btn');

@@ -16,17 +16,18 @@
 <body class = "dashboard-body">
     <header class="dashboard-header">
         <h1 class="dashboard-logo">PetStack</h1>
+        <button class="header-btn" id="btn-households">🏠</button>
     </header>
 
     <main class="dashboard-main">
-        <h2 class="welcome-message">Welcome, <span id="user-display-name">Friend</span>!</h2>
+        <h2 class="welcome-message" id="welcome-message" >Welcome, <span id="user-display-name">Friend</span>!</h2>
 
         <!-- Empty state: shown when user has no pets or households -->
         <section id="empty-state" class="empty-state">
-            <p class="empty-state-message">Looks like you're just getting started. What would you like to do first?</p>
+            <p class="empty-state-message" id="empty-state-message">Looks like you're just getting started. What would you like to do first?</p>
 
             <div class="action-cards">
-                <button class="action-card" id="btn-add-pet">
+                <button class="action-card hidden" id="btn-add-pet">
                     <span class="action-icon">🐾</span>
                     <span class="action-title">Add Your Pet</span>
                     <span class="action-desc">Start tracking activities for your furry friend</span>

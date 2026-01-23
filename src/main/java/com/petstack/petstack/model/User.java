@@ -63,20 +63,6 @@ public class User {
     private Set<HouseholdMember> householdMemberships = new HashSet<>();
 
     /**
-     * Many-to-Many: User <-> Pet
-     *
-     * A user can own multiple pets, and pets can have multiple owners
-     * Maps to the "pet_owners" junction table
-     */
-    @ManyToMany
-    @JoinTable(
-        name = "pet_owners",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "pet_id")
-    )
-    private Set<Pet> pets = new HashSet<>();
-
-    /**
      * One-to-Many: User -> Activities
      *
      * One user can log many activities
@@ -171,14 +157,6 @@ public class User {
         return households;
     }
 
-    public Set<Pet> getPets() {
-        return pets;
-    }
-
-    public void setPets(Set<Pet> pets) {
-        this.pets = pets;
-    }
-
     public Set<Activity> getActivities() {
         return activities;
     }
@@ -215,19 +193,6 @@ public class User {
         householdMemberships.removeIf(membership ->
             membership.getHousehold().equals(household)
         );
-    }
-
-    /**
-     * Helper method to add a pet while maintaining both sides of the relationship
-     */
-    public void addPet(Pet pet) {
-        this.pets.add(pet);
-        pet.getOwners().add(this);
-    }
-
-    public void removePet(Pet pet) {
-        this.pets.remove(pet);
-        pet.getOwners().remove(this);
     }
 
     // ============ UTILITY METHODS ============

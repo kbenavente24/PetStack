@@ -35,6 +35,9 @@ public class Household {
     @Column(name = "invite_code", unique = true, nullable = false, length = 50)
     private String inviteCode;
 
+    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Pet> pets = new HashSet<>();
+
     /**
      * One-to-Many: Household -> HouseholdMembers
      *
@@ -91,6 +94,14 @@ public class Household {
 
     public void setInviteCode(String inviteCode) {
         this.inviteCode = inviteCode;
+    }
+
+    public Set<Pet> getPets(){
+        return pets;
+    }
+
+    public void setPets(Set<Pet> pets){
+        this.pets = pets;
     }
 
     public Set<HouseholdMember> getHouseholdMemberships() {

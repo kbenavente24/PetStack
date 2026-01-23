@@ -11,9 +11,8 @@ import java.util.List;
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Integer>{
 
-    List<Activity> findByActivityDateAndUserUserIdAndPetPetId(
+    List<Activity> findByActivityDateAndPetPetId(
         LocalDate activityDate,
-        Integer userId,
         Integer petId
     );
 

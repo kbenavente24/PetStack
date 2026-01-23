@@ -19,21 +19,21 @@ public class PetController {
     }
 
     @PostMapping
-    public Pet createPet(@RequestBody CreatePetRequest request) {
-        return petService.createPet(request.getPetName(), request.getUserId());
+    public PetResponse createPet(@RequestBody CreatePetRequest request) {
+        return new PetResponse(petService.createPet(request.getPetName(), request.getHouseholdId()));
     }
     
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package
     public static class CreatePetRequest {
         private String petName;
-        private Integer userId;
+        private Integer householdId;
 
         // Getters and setters (required for JSON deserialization)
         public String getPetName() { return petName; }
         public void setPetName(String petName) { this.petName = petName; }
-        public Integer getUserId() { return userId; }
-        public void setUserId(Integer userId) { this.userId = userId; }
+        public Integer getHouseholdId() { return householdId; }
+        public void setHouseholdId(Integer householdId) { this.householdId = householdId; }
     }
 
     @DeleteMapping("/{petId}")
@@ -41,9 +41,9 @@ public class PetController {
         petService.deletePet(petId);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<PetResponse> getPetsByUser(@PathVariable Integer userId) {
-        List<Pet> pets = petService.getPetsByUserId(userId);
+    @GetMapping("/{householdId}")
+    public List<PetResponse> getPetsByHouseholdId(@PathVariable Integer householdId) {
+        List<Pet> pets = petService.getPetsByHouseholdId(householdId);
         return pets.stream().map(pet -> new PetResponse(pet)).toList();
     }
 

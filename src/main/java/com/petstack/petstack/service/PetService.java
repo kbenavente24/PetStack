@@ -2,8 +2,9 @@ package com.petstack.petstack.service;
 
 import com.petstack.petstack.model.Pet;
 import com.petstack.petstack.model.User;
+import com.petstack.petstack.model.Household;
 import com.petstack.petstack.repository.PetRepository;
-import com.petstack.petstack.repository.UserRepository;
+import com.petstack.petstack.repository.HouseholdRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -16,21 +17,18 @@ import java.util.List;
 public class PetService {
     
     private final PetRepository petRepository;
-    private final UserRepository userRepository;
+    private final HouseholdRepository householdRepository;
 
-    public PetService(PetRepository petRepository, UserRepository userRepository){
+    public PetService(PetRepository petRepository, HouseholdRepository householdRepository){
         this.petRepository = petRepository;
-        this.userRepository = userRepository;
+        this.householdRepository = householdRepository;
     }
 
-    public Pet createPet(String petName, Integer userId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Error getting user"));
-        Pet pet = new Pet(petName);
-        pet.getOwners().add(user);
-        user.getPets().add(pet);      // This is the owning side
+    public Pet createPet(String petName, Integer householdId){
+        Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Error getting household"));
+        Pet pet = new Pet(petName, household);
     
-        petRepository.save(pet);       // Save the pet first (so it gets an ID)
-        userRepository.save(user);     // Save user to persist the junction table entry
+        petRepository.save(pet);    
         return pet;
     }
 
@@ -44,12 +42,11 @@ public class PetService {
         petRepository.delete(pet);
     }
 
-    public List<Pet> getPetsByUserId(Integer userId) {
+    public List<Pet> getPetsByHouseholdId(Integer householdId){
+        Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Error getting household"));
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Error getting user"));
-
-        List<Pet> usersPets = new ArrayList<>();
-        usersPets.addAll(user.getPets());
-        return usersPets;
+        List<Pet> householdPets = new ArrayList<>();
+        householdPets.addAll(household.getPets());
+        return householdPets;
     }
 }

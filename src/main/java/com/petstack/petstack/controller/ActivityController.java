@@ -35,8 +35,8 @@ public class ActivityController {
     }
 
     @GetMapping("/pet")
-    public List<ActivityResponse> getActivitiesForPet(@RequestParam LocalDate date, @RequestParam Integer userId, @RequestParam Integer petId){
-        List<Activity> activities = activityService.getActivitiesForSpecificDate(date, userId, petId);
+    public List<ActivityResponse> getActivitiesForPet(@RequestParam LocalDate date, @RequestParam Integer householdId, @RequestParam Integer userId, @RequestParam Integer petId){
+        List<Activity> activities = activityService.getActivitiesForSpecificDate(date, householdId, userId, petId);
 
         return activities.stream().map(activity -> new ActivityResponse(activity)).toList();
     }
@@ -44,6 +44,7 @@ public class ActivityController {
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package
     public static class CreateActivityRequest {
+        private Integer householdId;
         private Integer userId;
         private Integer petId;
         private ActivityType activityType;
@@ -51,6 +52,7 @@ public class ActivityController {
         private LocalTime activityTime;
 
         // Getters and setters (required for JSON deserialization)
+        public Integer getHouseholdId() {return householdId; }
         public Integer getUserId() { return userId; }
         public Integer getPetId() { return petId; }
         public ActivityType getActivityType() { return activityType; }
@@ -59,6 +61,7 @@ public class ActivityController {
 
             // Setters
         public void setUserId(Integer userId) { this.userId = userId; }
+        public void setHousehouldId(Integer householdId) {this.householdId = householdId; }
         public void setPetId(Integer petId) { this.petId = petId; }
         public void setActivityType(ActivityType activityType) { this.activityType = activityType; }
         public void setActivityDate(LocalDate activityDate) { this.activityDate = activityDate; }

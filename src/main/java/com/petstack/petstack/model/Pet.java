@@ -52,16 +52,14 @@ public class Pet {
     private String ownerNotes;
 
     /**
-     * Many-to-Many: Pet <-> User
+     * Many-to-One: Pet -> Household
      *
-     * mappedBy = "pets": The User entity owns this relationship.
-     * User.java has the @JoinTable annotation that defines the "pet_owners" junction table.
-     * We don't repeat @JoinTable here - just reference it with mappedBy.
-     *
-     * This is the "inverse" side of the relationship.
+     * Many pets can belong to one household.
+     * The pet table has a household_id foreign key column.
      */
-    @ManyToMany(mappedBy = "pets")
-    private Set<User> owners = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "household_id")
+    private Household household;
 
     /**
      * One-to-Many: Pet -> Activities
@@ -86,8 +84,9 @@ public class Pet {
     /**
      * Constructor for creating a new pet with just a name
      */
-    public Pet(String petName) {
+    public Pet(String petName, Household household) {
         this.petName = petName;
+        this.household = household;
     }
 
     /**
@@ -149,12 +148,12 @@ public class Pet {
         this.ownerNotes = ownerNotes;
     }
 
-    public Set<User> getOwners() {
-        return owners;
+    public Household getHousehold() {
+        return household;
     }
 
-    public void setOwners(Set<User> owners) {
-        this.owners = owners;
+    public void setHousehold(Household household) {
+        this.household = household;
     }
 
     public Set<Activity> getActivities() {
