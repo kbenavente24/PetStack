@@ -50,13 +50,25 @@
         <!-- Active state: shown when user has pets/households (hidden by default) -->
         <section id="active-state" class="active-state hidden">
 
+            <div class="pet-avatar" id="pet-avatar">
+                <span class="pet-avatar-placeholder" id="pet-avatar-name">🐾</span>
+            </div>
+
             <select class = "pet-dropdown" id = "pet-dropdown"></select>
 
             <div class="activity-buttons">
-                <button class = "activity-btn" data-type="FED">Fed</button>
-                <button class = "activity-btn" data-type="WALKED">Walked</button>
-                <button class = "activity-btn" data-type="PEE">Pee</button>
-                <button class = "activity-btn" data-type="POOP">Poop</button>
+                <button class="activity-btn" data-type="FED" title="Fed">
+                    <img src="images/food-icon.png" alt="Fed" class="activity-icon">
+                </button>
+                <button class="activity-btn" data-type="WALKED" title="Walked">
+                    <img src="images/walking-icon.png" alt="Walked" class="activity-icon">
+                </button>
+                <button class="activity-btn" data-type="PEE" title="Pee">
+                    <img src="images/pee.png" alt="Pee" class="activity-icon">
+                </button>
+                <button class="activity-btn" data-type="POOP" title="Poop">
+                    <img src="images/poop.png" alt="Poop" class="activity-icon">
+                </button>
             </div>
 
             <ul class="activity-log" id="activity-log">

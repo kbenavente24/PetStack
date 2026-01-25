@@ -102,11 +102,14 @@ function setupLoginForm() {
             // localStorage persists even if you close the browser
             localStorage.setItem('userId', response.userId);
             localStorage.setItem('displayName', response.displayName);
+            localStorage.setItem('households', JSON.stringify(response.households));
+            console.log("empty households:");
+            console.log(JSON.parse(localStorage.getItem('households')));
 
-            if(response.households.length > 0){
-                console.log("User has households in their account, adding them to local storage.");
-                localStorage.setItem('households', JSON.stringify(response.households));
-            }
+            // if(response.households.length > 0){
+            //     console.log("User has households in their account, adding them to local storage.");
+            //     localStorage.setItem('households', JSON.stringify(response.households));
+            // }
 
             // After successful login, redirect to the main app
             window.location.href = '/dashboard.html';
@@ -137,6 +140,8 @@ async function setupDashboard() {
     setupActivityButtons();
     createHouseholdCardFunctionality();
     addPetCardFunctionality();
+    setUpHouseholdHeaderButton();
+
 
     // Check if user is logged in by looking for userId in localStorage
     const userId = localStorage.getItem('userId');
@@ -155,7 +160,7 @@ async function setupDashboard() {
     // If a user does not have any households, we do not need to proceed any further as the next
     // lines of code within this function pertain to loading households and/or pets.
     console.log(localStorage.getItem('households'));
-    if(localStorage.getItem('households') === null){
+    if(JSON.parse(localStorage.getItem('households')).length === 0){
         return;
     }
     const userHouseholds = JSON.parse(localStorage.getItem('households'));
@@ -203,7 +208,9 @@ function setUpSubmittingPetForm(){
 
         const data = Object.fromEntries(new FormData(form));
         data.userId = localStorage.getItem('userId');
-        data.householdId = JSON.parse(localStorage.getItem('households')).householdId;
+        console.log("household id for testing:");
+        console.log(JSON.parse(localStorage.getItem('households'))[0].householdId);
+        data.householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
         console.log(data);
     try {
       await apiCall('/api/pets', {
@@ -249,7 +256,9 @@ function setUpSubmittingHouseholdForm(){
             body: JSON.stringify(data)
         });
 
-        localStorage.setItem('households', JSON.stringify(household));
+        const existingHouseholds = JSON.parse(localStorage.getItem('households'));
+        existingHouseholds.push(household);
+        localStorage.setItem('households', JSON.stringify(existingHouseholds));
         console.log(JSON.parse(localStorage.getItem('households')));
         //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
         document.getElementById('modal-overlay').classList.add('hidden');
@@ -314,7 +323,7 @@ function openModal(contentType){
     startLoggingActivitiesBtn.addEventListener('click', async (e) => {
         document.getElementById('modal-overlay').classList.add('hidden');
         const userId = localStorage.getItem('userId');
-        const householdId = JSON.parse(localStorage.getItem('households')).householdId;
+        const householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
         const pets = await apiCall(`/api/pets/${householdId}`);
         if (pets.length > 0) {
         displayPets(pets);
@@ -339,7 +348,7 @@ function openModal(contentType){
 
     if(contentType === 'first-time-household-creation'){
         const topPageGreeting = document.getElementById('welcome-message');
-        topPageGreeting.textContent = JSON.parse(localStorage.getItem('households')).householdName;
+        topPageGreeting.textContent = JSON.parse(localStorage.getItem('households'))[0].householdName;
         const firstHouseholdMessage = document.getElementById('empty-state-message');
         firstHouseholdMessage.textContent = "Now that you've created a household, it's time to add a pet. From there, you could either begin stacking or invite friends and family to your household!";
         document.getElementById('btn-add-pet').classList.remove('hidden');
@@ -374,6 +383,7 @@ function setupActivityButtons() {
 async function logActivity(activityType){
     const userId = localStorage.getItem('userId');
     const petId = localStorage.getItem('petId');
+    const householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
     const today = new Date();
     const todaysDate = today.toISOString().split('T')[0];
     const todaysTime = today.toTimeString().split(' ')[0];  // "14:30:45"
@@ -387,7 +397,7 @@ async function logActivity(activityType){
             activityTime: todaysTime,
         })
     } );
-    const activities = await apiCall(`/api/activity/pet?date=${todaysDate}&userId=${userId}&petId=${petId}`);
+    const activities = await apiCall(`/api/activity/pet?date=${todaysDate}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
     displayActivityLog(activities);
 }
 
@@ -409,17 +419,91 @@ function displayPets(pets) {
     option.textContent = pets[0].petName;
     petDropdown.appendChild(option);
 
+    const petProfilePicture = document.getElementById('pet-avatar-name');
+    petProfilePicture.textContent = pets[0].petName;
+
 }
 
 function displayActivityLog(activities){
     const activityLog = document.getElementById('activity-log');
     activityLog.innerHTML = '';
     for(const activity of activities){
-    const log = document.createElement('li');
-    log.className = 'activity-entry';  
-    log.textContent = `${activity.petName} was ${activity.activityType} with ${activity.loggedByName} @ ${activity.activityTime}`
-    activityLog.append(log);
+        const log = document.createElement('li');
+        log.className = 'activity-entry';
+
+        const icon = getActivityIcon(activity.activityType);
+        const text = document.createElement('span');
+
+        if(activity.activityType == "FED"){
+            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+        }
+        if(activity.activityType == "WALKED"){
+            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+        }
+        if(activity.activityType == "POOP"){
+            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+        }
+        if(activity.activityType == "PEE"){
+            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+        }        
+
+        log.appendChild(icon);
+        log.appendChild(text);
+        activityLog.prepend(log);
     }
+}
+
+/**
+ * Returns the icon element for a given activity type
+ * @param {string} activityType - The type of activity (FED, WALKED, PEE, POOP)
+ * @returns {HTMLElement} The icon element (img or span)
+ */
+function getActivityIcon(activityType) {
+    const iconMap = {
+        'FED': { type: 'image', value: 'images/food-icon.png' },
+        'WALKED': { type: 'image', value: 'images/walking-icon.png' },
+        'PEE': { type: 'image', value: 'images/pee.png' },
+        'POOP': { type: 'image', value: 'images/poop.png' }
+    };
+
+    const iconData = iconMap[activityType] || { type: 'emoji', value: '❓' };
+
+    if (iconData.type === 'image') {
+        const img = document.createElement('img');
+        img.src = iconData.value;
+        img.alt = activityType;
+        img.className = 'activity-entry-icon';
+        return img;
+    } else {
+        const span = document.createElement('span');
+        span.textContent = iconData.value;
+        span.className = 'activity-entry-icon';
+        return span;
+    }
+}
+
+/**
+ * Converts 24-hour time string to 12-hour format
+ * @param {string} time24 - Time in "HH:MM:SS" or "HH:MM" format
+ * @returns {string} Time in "H:MM AM/PM" format
+ */
+function formatTime12Hour(time24) {
+    const [hours, minutes] = time24.split(':');
+    const date = new Date();
+    date.setHours(hours, minutes);
+    return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+function setUpHouseholdHeaderButton(){
+    const householdButton = document.getElementById('btn-households');
+    householdButton.addEventListener('click', (e) => {
+        window.location.href = '/households.html';        
+    });
+
 }
 
 
