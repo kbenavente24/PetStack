@@ -412,6 +412,10 @@ a:hover {
     max-height: 100dvh;
 }
 
+.households-body{
+    overflow-y: auto;
+}
+
 .dashboard-main {
     flex: 1;
     display: flex;
@@ -659,6 +663,67 @@ a:hover {
 
 .mb-md {
     margin-bottom: var(--spacing-md);
+}
+
+/* Households Grid */
+.households-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-xl) 0;
+}
+
+.household-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: var(--spacing-sm);
+    word-break: break-word;
+}
+
+.household-circle:hover {
+    transform: scale(1.08);
+    box-shadow: var(--shadow-md);
+}
+
+.household-page-btns{
+    display:flex;
+    justify-content:center;
+    gap: var(--spacing-md);
+}
+
+.individual-household-content{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+
+.household-profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm);
+    word-break: break-word;
 }
 
 /* ===========================================

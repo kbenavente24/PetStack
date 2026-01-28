@@ -141,6 +141,7 @@ async function setupDashboard() {
     createHouseholdCardFunctionality();
     addPetCardFunctionality();
     setUpHouseholdHeaderButton();
+    joinHouseholdCardFunctionality()
 
 
     // Check if user is logged in by looking for userId in localStorage
@@ -270,6 +271,13 @@ function setUpSubmittingHouseholdForm(){
     });
 }
 
+function joinHouseholdCardFunctionality(){
+    const joinHouseholdButton = document.getElementById('btn-join-household');
+    joinHouseholdButton.addEventListener('click', (e) => {
+        openModal('join-household');
+    });
+}
+
 
 
 
@@ -354,8 +362,45 @@ function openModal(contentType){
         document.getElementById('btn-add-pet').classList.remove('hidden');
         document.getElementById('btn-create-household').classList.add('hidden');
         document.getElementById('btn-join-household').classList.add('hidden');
+    }
 
-        
+    if(contentType === "join-household"){
+    content.innerHTML = `
+      <h2 class="text-center">Join a Household</h2>
+      <p class="text-small mb-md">Each household is provided a unique invite code. If you were shared one, paste or enter it below!</p>
+      <form id="join-household-form">
+        <label>Invite Code</label>
+        <input type="text" name="inviteCode" required>
+        <button type="submit" class="modal-btn">Confirm</button>
+      </form>
+    `;
+
+    const form = document.getElementById('join-household-form');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(form));
+        data.userId = localStorage.getItem('userId');
+        data.role = "Member";
+    try {
+        const household = await apiCall('/api/householdmember', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+
+        const existingHouseholds = JSON.parse(localStorage.getItem('households'));
+        existingHouseholds.push(household);
+        localStorage.setItem('households', JSON.stringify(existingHouseholds));
+        console.log(JSON.parse(localStorage.getItem('households')));
+        //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
+        document.getElementById('modal-overlay').classList.add('hidden');
+    
+        } catch (error) {
+            console.error('Failed to :', error);
+        }
+    });
+    document.getElementById('modal-overlay').classList.remove('hidden');        
     }
 
 }
@@ -501,10 +546,12 @@ function formatTime12Hour(time24) {
 function setUpHouseholdHeaderButton(){
     const householdButton = document.getElementById('btn-households');
     householdButton.addEventListener('click', (e) => {
-        window.location.href = '/households.html';        
+        window.location.href = '/households.html';   
+
     });
 
 }
+
 
 
 

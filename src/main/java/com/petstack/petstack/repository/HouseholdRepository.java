@@ -11,5 +11,5 @@ import java.util.Optional;
 
 @Repository
 public interface HouseholdRepository extends JpaRepository<Household, Integer>{
-
+    Optional<Household> findByInviteCode(String inviteCode);
 }

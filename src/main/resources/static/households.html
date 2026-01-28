@@ -13,19 +13,37 @@
     <!-- Your CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="dashboard-body">
+<body class="households-body">
     <header class="dashboard-header">
         <h1 class="dashboard-logo">PetStack</h1>
-        <button class="header-btn" id="btn-back">←</button>
+        <button class="header-btn" id="btn-back">&#x2190;</button>
     </header>
 
     <main class="dashboard-main">
-        <h2 class="welcome-message">Your Households</h2>
+        <h2 class="welcome-message" id="welcome-message">Your Households</h2>
+        <div class="household-page-btns" id="household-page-btns">
+            <button id ="create-household-btn">Create Household</button>
+            <button id="join-household-btn">Join Household</button>
+        </div>
+
 
         <section id="households-content">
             <!-- Household circles will go here -->
         </section>
+        <section class = "individual-household-content hidden" id="individual-household-content">
+            <!-- Individual household content goes here -->
+        </section>
     </main>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id ="modal-card" class="modal-card">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-content" id="modal-content">
+
+            </div>
+        </div>
+    </div>
+
 
     <script src="js/households.js"></script>
 </body>

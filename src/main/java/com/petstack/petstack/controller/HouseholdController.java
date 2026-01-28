@@ -8,6 +8,9 @@ import com.petstack.petstack.model.Household;
 import com.petstack.petstack.service.HouseholdService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -23,9 +26,9 @@ public class HouseholdController {
     @PostMapping
     public HouseholdResponse createHousehold(@RequestBody CreateHouseholdRequest request) {
         Household household = householdService.createHousehold(request.getUserId(), request.getHouseholdName(), request.getRole());
-        
         return new HouseholdResponse(household);
     }
+
 
     public static class CreateHouseholdRequest{
         private Integer userId;

@@ -22,14 +22,16 @@ public class HouseholdMemberService {
         this.householdMemberRepository = householdMemberRepository;
     }
 
-    public void registerHouseholdMember(Integer userId, Integer householdId, String role){
+    public Household registerHouseholdMember(Integer userId, String inviteCode, String role){
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
 
-        Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Household not found!"));
+        Household household = householdRepository.findByInviteCode(inviteCode).orElseThrow(() -> new RuntimeException("Household not found! Possible invalid invite code."));
 
         HouseholdMember member = new HouseholdMember(user, household, role);
 
         householdMemberRepository.save(member);
+
+        return household;
         
     }
 

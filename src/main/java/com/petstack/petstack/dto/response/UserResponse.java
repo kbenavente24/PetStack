@@ -22,7 +22,8 @@ public class UserResponse {
             .map(membership -> new HouseholdInfo(
                 membership.getHousehold().getHouseholdId(),
                 membership.getHousehold().getHouseholdName(),
-                membership.getUserRole()
+                membership.getUserRole(),
+                membership.getHousehold().getInviteCode()
             )).toList();        
     }
 
@@ -56,11 +57,13 @@ public class UserResponse {
         private Integer householdId;
         private String householdName;
         private String role;
+        private String inviteCode;
 
-        public HouseholdInfo(Integer householdId, String householdName, String role){
+        public HouseholdInfo(Integer householdId, String householdName, String role, String inviteCode){
             this.householdId = householdId;
             this.householdName = householdName;
             this.role = role;
+            this.inviteCode = inviteCode;
         }
 
         public Integer getHouseholdId(){
@@ -72,6 +75,9 @@ public class UserResponse {
         }
         public String getRole(){
             return this.role;
+        }
+        public String getInviteCode(){
+            return this.inviteCode;
         }
 
     }
