@@ -32,6 +32,10 @@ public class UserService {
         return true;
     }
 
+    public User getUserByID(Integer userId){
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+    }
+
 
 
 

@@ -1,8 +1,12 @@
 package com.petstack.petstack.controller;
 
+import com.petstack.petstack.dto.response.UserResponse;
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.service.UserService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController  // Tells Spring: "This handles HTTP requests and returns JSON"
 @RequestMapping("/api/users")  // Base path for all endpoints in this controller
@@ -34,6 +38,13 @@ public class UserController {
             request.getDisplayName()
         );
     }
+
+    @GetMapping("/{userId}")
+    public UserResponse getUserState(@PathVariable Integer userId) {
+        User user = userService.getUserByID(userId);
+        return new UserResponse(user);
+    }
+    
 
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package

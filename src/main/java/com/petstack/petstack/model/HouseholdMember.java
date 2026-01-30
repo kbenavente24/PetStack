@@ -1,5 +1,9 @@
 package com.petstack.petstack.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -90,6 +94,10 @@ public class HouseholdMember {
     @Column(name = "user_role", nullable = false, length = 50)
     private String userRole = "member";  // Default value
 
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
     // ═══════════════════════════════════════════════════════
     // CONSTRUCTORS
     // ═══════════════════════════════════════════════════════
@@ -118,6 +126,10 @@ public class HouseholdMember {
     // ═══════════════════════════════════════════════════════
     // GETTERS AND SETTERS
     // ═══════════════════════════════════════════════════════
+
+    public LocalDateTime getCreatedAt(){
+        return this.createdAt;
+    }
 
     public HouseholdMemberId getId() {
         return id;

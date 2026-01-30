@@ -1,5 +1,6 @@
 package com.petstack.petstack.dto.response;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.petstack.petstack.model.User;
@@ -19,6 +20,7 @@ public class UserResponse {
         this.displayName = user.getDisplayName();
         this.profilePicture = user.getProfilePicture();
         this.households = user.getHouseholdMemberships().stream()
+            .sorted(Comparator.comparing(membership -> membership.getCreatedAt()))
             .map(membership -> new HouseholdInfo(
                 membership.getHousehold().getHouseholdId(),
                 membership.getHousehold().getHouseholdName(),

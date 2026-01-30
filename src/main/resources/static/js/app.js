@@ -103,8 +103,6 @@ function setupLoginForm() {
             localStorage.setItem('userId', response.userId);
             localStorage.setItem('displayName', response.displayName);
             localStorage.setItem('households', JSON.stringify(response.households));
-            console.log("empty households:");
-            console.log(JSON.parse(localStorage.getItem('households')));
 
             // if(response.households.length > 0){
             //     console.log("User has households in their account, adding them to local storage.");
@@ -141,7 +139,8 @@ async function setupDashboard() {
     createHouseholdCardFunctionality();
     addPetCardFunctionality();
     setUpHouseholdHeaderButton();
-    joinHouseholdCardFunctionality()
+    joinHouseholdCardFunctionality();
+    setupDateDisplay();
 
 
     // Check if user is logged in by looking for userId in localStorage
@@ -166,7 +165,6 @@ async function setupDashboard() {
     }
     const userHouseholds = JSON.parse(localStorage.getItem('households'));
     const firstHouseholdId = userHouseholds[0].householdId;
-    console.log(firstHouseholdId);
 
 
     // Load the user's pets
@@ -256,10 +254,12 @@ function setUpSubmittingHouseholdForm(){
             method: 'POST',
             body: JSON.stringify(data)
         });
-
-        const existingHouseholds = JSON.parse(localStorage.getItem('households'));
-        existingHouseholds.push(household);
-        localStorage.setItem('households', JSON.stringify(existingHouseholds));
+    
+    
+        const userStateRefresh = await apiCall(`/api/users/${localStorage.getItem('userId')}`, {
+            method: 'GET'
+        });
+        localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
         console.log(JSON.parse(localStorage.getItem('households')));
         //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
         document.getElementById('modal-overlay').classList.add('hidden');
@@ -389,9 +389,10 @@ function openModal(contentType){
             body: JSON.stringify(data)
         });
 
-        const existingHouseholds = JSON.parse(localStorage.getItem('households'));
-        existingHouseholds.push(household);
-        localStorage.setItem('households', JSON.stringify(existingHouseholds));
+        const userStateRefresh = await apiCall(`/api/users/${localStorage.getItem('userId')}`, {
+            method: 'GET'
+        });
+        localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
         console.log(JSON.parse(localStorage.getItem('households')));
         //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
         document.getElementById('modal-overlay').classList.add('hidden');
@@ -453,6 +454,7 @@ function displayPets(pets) {
     // Hide empty state, show active state
     const emptyState = document.getElementById('empty-state');
     const activeState = document.getElementById('active-state');
+    document.getElementById('welcome-message').classList.add('hidden');
 
     if (emptyState) emptyState.style.display = 'none';
     if (activeState) {
@@ -496,6 +498,41 @@ function displayActivityLog(activities){
         log.appendChild(text);
         activityLog.prepend(log);
     }
+}
+
+function setupDateDisplay() {
+    const dateSpan = document.getElementById('activity-date');
+    if (!dateSpan) return;
+    const rememberCurrentDay = new Date();
+    const today = new Date();
+    dateSpan.textContent = today.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
+    const previousDayButton = document.getElementById('date-prev');
+    const nextDayButton = document.getElementById('date-next');
+
+    previousDayButton.addEventListener('click', (e) => {
+        today.setDate(today.getDate() - 1);
+        dateSpan.textContent = today.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    })
+    nextDayButton.addEventListener('click', (e) => {
+        if(today.toDateString() === rememberCurrentDay.toDateString()){
+            return;
+        }
+        today.setDate(today.getDate() + 1);
+        dateSpan.textContent = today.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    })
 }
 
 /**

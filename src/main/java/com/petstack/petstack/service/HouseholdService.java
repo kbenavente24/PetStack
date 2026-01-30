@@ -39,6 +39,7 @@ public class HouseholdService {
 
         return household;
     }
+    
 
     private String generateInviteCode() {
         String characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";  // Excluded 0, O, 1, I to avoid confusion
