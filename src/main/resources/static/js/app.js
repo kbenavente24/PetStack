@@ -167,16 +167,15 @@ async function setupDashboard() {
     const firstHouseholdId = userHouseholds[0].householdId;
 
 
-    // Load the user's pets
     try {
         const today = new Date();
-        const date = today.toISOString().split('T')[0];  // "2026-01-19"    
+        const { start, end } = getDayRange(today);
+        
         const pets = await apiCall(`/api/pets/${firstHouseholdId}`);
         console.log(pets);
-        // If user has pets, show them; otherwise show empty state
-        console.log("hi");
+
         if (pets.length > 0) {
-            const activities = await apiCall(`/api/activity/pet?date=${date}&householdId=${firstHouseholdId}&userId=${userId}&petId=${pets[0].petId}`);
+            const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${firstHouseholdId}&userId=${userId}&petId=${pets[0].petId}`);
             console.log(activities);
             displayPets(pets);
             displayActivityLog(activities);
@@ -185,6 +184,7 @@ async function setupDashboard() {
     } catch (error) {
         console.error('Failed to load pets:', error);
     }
+
 }
 
 //------------"ADD PET" MENU CARD FUNCTIONALITY + HELPER FUNCTIONS -------------------
@@ -430,20 +430,18 @@ async function logActivity(activityType){
     const userId = localStorage.getItem('userId');
     const petId = localStorage.getItem('petId');
     const householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
-    const today = new Date();
-    const todaysDate = today.toISOString().split('T')[0];
-    const todaysTime = today.toTimeString().split(' ')[0];  // "14:30:45"
+    const activityTimestamp = new Date().toISOString();  // Single timestamp
+    const { start, end } = getDayRange(new Date());
     await apiCall(`/api/activity`, {
         method: 'POST',
         body: JSON.stringify({
             userId: userId,
             petId: petId,
             activityType: activityType,
-            activityDate: todaysDate,
-            activityTime: todaysTime,
+            activityTimestamp: activityTimestamp
         })
     } );
-    const activities = await apiCall(`/api/activity/pet?date=${todaysDate}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
     displayActivityLog(activities);
 }
 
@@ -482,16 +480,16 @@ function displayActivityLog(activities){
         const text = document.createElement('span');
 
         if(activity.activityType == "FED"){
-            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
         }
         if(activity.activityType == "WALKED"){
-            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
         }
         if(activity.activityType == "POOP"){
-            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
         }
         if(activity.activityType == "PEE"){
-            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTime)}`;            
+            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
         }        
 
         log.appendChild(icon);
@@ -514,24 +512,32 @@ function setupDateDisplay() {
     const previousDayButton = document.getElementById('date-prev');
     const nextDayButton = document.getElementById('date-next');
 
-    previousDayButton.addEventListener('click', (e) => {
+    previousDayButton.addEventListener('click', async (e) => {
         today.setDate(today.getDate() - 1);
+        const { start, end } = getDayRange(today);
+        
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${JSON.parse(localStorage.getItem('households'))[0].householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+        
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
             year: 'numeric'
         });
+        displayActivityLog(changedActivityLog);
     })
-    nextDayButton.addEventListener('click', (e) => {
+    nextDayButton.addEventListener('click', async (e) => {
         if(today.toDateString() === rememberCurrentDay.toDateString()){
             return;
         }
         today.setDate(today.getDate() + 1);
-        dateSpan.textContent = today.toLocaleDateString('en-US', {
+        const { start, end } = getDayRange(today);
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${JSON.parse(localStorage.getItem('households'))[0].householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+        dateSpan.textContent = today.toLocaleDateString('en-CA', {
             month: 'long',
             day: 'numeric',
             year: 'numeric'
         });
+        displayActivityLog(changedActivityLog);
     })
 }
 
@@ -565,20 +571,26 @@ function getActivityIcon(activityType) {
 }
 
 /**
- * Converts 24-hour time string to 12-hour format
- * @param {string} time24 - Time in "HH:MM:SS" or "HH:MM" format
+ * Converts ISO timestamp to 12-hour format in local timezone
+ * @param {string} isoTimestamp - ISO timestamp like "2026-01-29T20:30:45.123Z"
  * @returns {string} Time in "H:MM AM/PM" format
  */
-function formatTime12Hour(time24) {
-    const [hours, minutes] = time24.split(':');
-    const date = new Date();
-    date.setHours(hours, minutes);
+function formatTime12Hour(isoTimestamp) {
+    const date = new Date(isoTimestamp);
     return date.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
     });
 }
+
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 
 function setUpHouseholdHeaderButton(){
     const householdButton = document.getElementById('btn-households');
@@ -587,6 +599,24 @@ function setUpHouseholdHeaderButton(){
 
     });
 
+}
+
+/**
+ * Gets the start and end of day as ISO timestamps for API queries
+ * @param {Date} date - The date to get range for
+ * @returns {Object} - { start: ISO string, end: ISO string }
+ */
+function getDayRange(date) {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    
+    return {
+        start: start.toISOString(),
+        end: end.toISOString()
+    };
 }
 
 

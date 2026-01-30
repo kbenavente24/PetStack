@@ -1,7 +1,6 @@
 package com.petstack.petstack.dto.response;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.Instant;
 
 import com.petstack.petstack.model.Activity;
 
@@ -9,8 +8,7 @@ public class ActivityResponse {
     private String activityType;
     private String petName;
     private String loggedByName;
-    private LocalDate activityDate;
-    private LocalTime activityTime;
+    private Instant activityTimestamp;
     private String activityNotes;
     // NOT including owners or activities - breaks the cycle!
 
@@ -19,16 +17,15 @@ public class ActivityResponse {
         // ask claude about this
         this.activityType = activity.getActivityType().name(); 
         this.loggedByName = activity.getUser().getDisplayName();
-        this.activityDate = activity.getActivityDate();
-        this.activityTime = activity.getActivityTime();
+        this.activityTimestamp = activity.getActivityTimestamp();
         this.activityNotes = activity.getActivityNotes();
     }
 
     // Getters
+    //note: ask what these getters are even for
     public String getPetName() { return petName; }
     public String getActivityType() { return activityType; } 
     public String getLoggedByName() { return loggedByName; }
-    public LocalDate getActivityDate() { return activityDate; }
-    public LocalTime getActivityTime() { return activityTime; }
+    public Instant getActivityTimestamp() { return activityTimestamp; }
     public String getActivityNotes() { return activityNotes; }
 }

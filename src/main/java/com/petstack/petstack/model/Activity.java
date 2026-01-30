@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -52,13 +53,9 @@ public class Activity {
     @Column(name = "activity_type", nullable = false, length = 50)
     private ActivityType activityType;
 
-    @NotNull(message = "Activity date is required")
-    @Column(name = "activity_date", nullable = false)
-    private LocalDate activityDate;
-
-    @NotNull(message = "Activity time is required")
-    @Column(name = "activity_time", nullable = false)
-    private LocalTime activityTime;
+    @NotNull(message = "Timestamp is required")
+    @Column(name = "activity_timestamp")
+    private Instant activityTimestamp;
 
     @Column(name = "activity_notes", columnDefinition = "TEXT")
     private String activityNotes;
@@ -74,15 +71,18 @@ public class Activity {
     /**
      * Constructor for creating a new activity
      */
-    public Activity(User user, Pet pet, ActivityType activityType, LocalDate activityDate, LocalTime activityTime) {
+    public Activity(User user, Pet pet, ActivityType activityType, Instant activityTimestamp) {
         this.user = user;
         this.pet = pet;
         this.activityType = activityType;
-        this.activityDate = activityDate;
-        this.activityTime = activityTime;
+        this.activityTimestamp = activityTimestamp;
     }
 
     // ============ GETTERS AND SETTERS ============
+
+    public Instant getActivityTimestamp(){
+        return activityTimestamp;
+    }
 
     public Integer getActivityId() {
         return activityId;
@@ -116,22 +116,6 @@ public class Activity {
         this.activityType = activityType;
     }
 
-    public LocalDate getActivityDate() {
-        return activityDate;
-    }
-
-    public void setActivityDate(LocalDate activityDate) {
-        this.activityDate = activityDate;
-    }
-
-    public LocalTime getActivityTime() {
-        return activityTime;
-    }
-
-    public void setActivityTime(LocalTime activityTime) {
-        this.activityTime = activityTime;
-    }
-
     public String getActivityNotes() {
         return activityNotes;
     }
@@ -147,8 +131,7 @@ public class Activity {
         return "Activity{" +
                 "activityId=" + activityId +
                 ", activityType='" + activityType + '\'' +
-                ", activityDate=" + activityDate +
-                ", activityTime=" + activityTime +
+                ", activityTimestamp=" + activityTimestamp +
                 '}';
     }
 }
