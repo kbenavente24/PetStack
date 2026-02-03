@@ -5,4 +5,4 @@ builder = "nixpacks"
 NIXPACKS_JDK_VERSION = "21"
 
 [deploy]
-startCommand = "java -Dserver.port=$PORT -jar target/*.jar"
+startCommand = "java -jar target/*.jar"
