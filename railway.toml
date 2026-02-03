@@ -1,8 +1,0 @@
-[build]
-builder = "nixpacks"
-
-[build.args]
-NIXPACKS_JDK_VERSION = "21"
-
-[deploy]
-startCommand = "java -jar target/*.jar"
