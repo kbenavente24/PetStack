@@ -84,6 +84,10 @@ public class Activity {
         return activityTimestamp;
     }
 
+    public void setActivityTimestamp(Instant activityTimestamp) {
+        this.activityTimestamp = activityTimestamp;
+    }
+
     public Integer getActivityId() {
         return activityId;
     }

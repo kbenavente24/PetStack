@@ -24,11 +24,14 @@ public class PetService {
         this.householdRepository = householdRepository;
     }
 
-    public Pet createPet(String petName, Integer householdId){
+    public Pet createPet(String petName, Integer householdId, String petSpecies){
         Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Error getting household"));
         Pet pet = new Pet(petName, household);
-    
-        petRepository.save(pet);    
+        if (petSpecies != null && !petSpecies.isBlank()) {
+            pet.setPetSpecies(petSpecies);
+        }
+
+        petRepository.save(pet);
         return pet;
     }
 

@@ -16,7 +16,11 @@
 <body class = "dashboard-body">
     <header class="dashboard-header">
         <h1 class="dashboard-logo">PetStack</h1>
-        <button class="header-btn" id="btn-households">🏠</button>
+        <nav class="header-nav">
+            <a href="dashboard.html" class="header-nav-btn active" title="Dashboard">📋</a>
+            <a href="households.html" class="header-nav-btn" title="Households">🏠</a>
+            <a href="profile.html" class="header-nav-btn" title="Profile">👤</a>
+        </nav>
     </header>
 
     <main class="dashboard-main">
@@ -54,7 +58,14 @@
                 <span class="pet-avatar-placeholder" id="pet-avatar-name">🐾</span>
             </div>
 
-            <select class = "pet-dropdown" id = "pet-dropdown"></select>
+            <div class="dropdown-row">
+                <span class="dropdown-icon">🏠</span>
+                <select class="household-dropdown" id="household-dropdown"></select>
+            </div>
+            <div class="dropdown-row">
+                <span class="dropdown-icon">🐾</span>
+                <select class="pet-dropdown" id="pet-dropdown"></select>
+            </div>
 
             <div class="date-nav" id="date-nav">
                 <button id="date-prev">←</button>

@@ -65,4 +65,40 @@ public class ActivityService {
 
         return activityRepository.findActivitiesForDateRange(petId, start, end);
     }
+
+    public void deleteActivity(Integer activityId, Integer userId) {
+        Activity activity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new RuntimeException("Activity not found!"));
+
+        // Only allow the user who logged the activity to delete it
+        if (!activity.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("You can only delete activities you logged!");
+        }
+
+        activityRepository.delete(activity);
+    }
+
+    public Activity updateActivityTime(Integer activityId, Integer userId, Instant newTimestamp) {
+        Activity activity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new RuntimeException("Activity not found!"));
+
+        if (!activity.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("You can only edit activities you logged!");
+        }
+
+        activity.setActivityTimestamp(newTimestamp);
+        return activityRepository.save(activity);
+    }
+
+    public Activity updateActivityType(Integer activityId, Integer userId, ActivityType newType) {
+        Activity activity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new RuntimeException("Activity not found!"));
+
+        if (!activity.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("You can only edit activities you logged!");
+        }
+
+        activity.setActivityType(newType);
+        return activityRepository.save(activity);
+    }
 }

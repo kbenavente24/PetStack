@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Households - PetStack</title>
+    <title>Profile - PetStack</title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,42 +13,41 @@
     <!-- Your CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="households-body">
+<body class="dashboard-body">
     <header class="dashboard-header">
         <h1 class="dashboard-logo">PetStack</h1>
         <nav class="header-nav">
             <a href="dashboard.html" class="header-nav-btn" title="Dashboard">📋</a>
-            <a href="households.html" class="header-nav-btn active" title="Households">🏠</a>
-            <a href="profile.html" class="header-nav-btn" title="Profile">👤</a>
+            <a href="households.html" class="header-nav-btn" title="Households">🏠</a>
+            <a href="profile.html" class="header-nav-btn active" title="Profile">👤</a>
         </nav>
     </header>
 
     <main class="dashboard-main">
-        <h2 class="welcome-message" id="welcome-message">Your Households</h2>
-        <div class="household-page-btns" id="household-page-btns">
-            <button id ="create-household-btn">Create Household</button>
-            <button id="join-household-btn">Join Household</button>
-        </div>
+        <h2 class="welcome-message" id="welcome-message">Your Profile</h2>
 
+        <section class="profile-content">
+            <div class="profile-avatar" id="profile-avatar">
+                <span class="profile-avatar-placeholder">👤</span>
+            </div>
 
-        <section id="households-content">
-            <!-- Household circles will go here -->
-        </section>
-        <section class = "individual-household-content hidden" id="individual-household-content">
-            <!-- Individual household content goes here -->
+            <p class="profile-display-name" id="profile-display-name">Loading...</p>
+
+            <div class="profile-actions">
+                <button class="btn btn-secondary btn-full" id="btn-change-display-name">Change Display Name</button>
+                <button class="btn btn-primary btn-full" id="btn-sign-out">Sign Out</button>
+            </div>
         </section>
     </main>
 
     <div id="modal-overlay" class="modal-overlay hidden">
-        <div id ="modal-card" class="modal-card">
+        <div id="modal-card" class="modal-card">
             <button class="modal-close" id="modal-close">&times;</button>
             <div class="modal-content" id="modal-content">
-
             </div>
         </div>
     </div>
 
-
-    <script src="js/households.js"></script>
+    <script src="js/profile.js"></script>
 </body>
 </html>

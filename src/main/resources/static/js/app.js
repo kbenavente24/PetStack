@@ -129,7 +129,6 @@ function setupLoginForm() {
 async function setupDashboard() {
     // Check if we're on the dashboard page
     const displayNameElement = document.getElementById('user-display-name');
-    
 
     if (!displayNameElement){
         return;
@@ -138,15 +137,12 @@ async function setupDashboard() {
     setupActivityButtons();
     createHouseholdCardFunctionality();
     addPetCardFunctionality();
-    setUpHouseholdHeaderButton();
     joinHouseholdCardFunctionality();
     setupDateDisplay();
-
 
     // Check if user is logged in by looking for userId in localStorage
     const userId = localStorage.getItem('userId');
     const displayName = localStorage.getItem('displayName');
-
 
     if (!userId) {
         // Not logged in - redirect to login page
@@ -157,34 +153,174 @@ async function setupDashboard() {
     // User is logged in - show their name
     displayNameElement.textContent = displayName;
 
-    // If a user does not have any households, we do not need to proceed any further as the next
-    // lines of code within this function pertain to loading households and/or pets.
-    console.log(localStorage.getItem('households'));
-    if(JSON.parse(localStorage.getItem('households')).length === 0){
+    // If a user does not have any households, show empty state
+    const userHouseholds = JSON.parse(localStorage.getItem('households')) || [];
+    if (userHouseholds.length === 0) {
         return;
     }
-    const userHouseholds = JSON.parse(localStorage.getItem('households'));
-    const firstHouseholdId = userHouseholds[0].householdId;
 
+    // Determine which household to show (last used or first)
+    const lastHouseholdId = localStorage.getItem('lastHouseholdId');
+    let selectedHousehold = userHouseholds.find(h => h.householdId == lastHouseholdId);
+    if (!selectedHousehold) {
+        selectedHousehold = userHouseholds[0];
+    }
 
+    // Populate and setup household dropdown
+    populateHouseholdDropdown(userHouseholds, selectedHousehold.householdId);
+    setupHouseholdDropdownHandler();
+
+    // Load pets for the selected household
+    await loadPetsForHousehold(selectedHousehold.householdId);
+}
+
+/**
+ * Populates the household dropdown with all user's households
+ */
+function populateHouseholdDropdown(households, selectedHouseholdId) {
+    const householdDropdown = document.getElementById('household-dropdown');
+    if (!householdDropdown) return;
+
+    householdDropdown.innerHTML = '';
+    households.forEach(household => {
+        const option = document.createElement('option');
+        option.value = household.householdId;
+        option.textContent = household.householdName;
+        if (household.householdId == selectedHouseholdId) {
+            option.selected = true;
+        }
+        householdDropdown.appendChild(option);
+    });
+}
+
+/**
+ * Sets up the household dropdown change handler
+ */
+function setupHouseholdDropdownHandler() {
+    const householdDropdown = document.getElementById('household-dropdown');
+    if (!householdDropdown) return;
+
+    householdDropdown.addEventListener('change', async (e) => {
+        const householdId = e.target.value;
+        localStorage.setItem('lastHouseholdId', householdId);
+        await loadPetsForHousehold(householdId);
+    });
+}
+
+/**
+ * Loads pets for a household and updates the pet dropdown
+ */
+async function loadPetsForHousehold(householdId) {
     try {
-        const today = new Date();
-        const { start, end } = getDayRange(today);
-        
-        const pets = await apiCall(`/api/pets/${firstHouseholdId}`);
-        console.log(pets);
+        const pets = await apiCall(`/api/pets/${householdId}`);
+
+        // Always show active state when user has households (so they can switch)
+        const emptyState = document.getElementById('empty-state');
+        const activeState = document.getElementById('active-state');
+        document.getElementById('welcome-message').classList.add('hidden');
+        if (emptyState) emptyState.style.display = 'none';
+        if (activeState) activeState.classList.remove('hidden');
+
+        // Save the household selection
+        localStorage.setItem('lastHouseholdId', householdId);
 
         if (pets.length > 0) {
-            const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${firstHouseholdId}&userId=${userId}&petId=${pets[0].petId}`);
-            console.log(activities);
-            displayPets(pets);
-            displayActivityLog(activities);
-            localStorage.setItem('petId', pets[0].petId);
+            // Determine which pet to select (last used or first)
+            const lastPetId = localStorage.getItem('lastPetId');
+            let selectedPet = pets.find(p => p.petId == lastPetId);
+            if (!selectedPet) {
+                selectedPet = pets[0];
+            }
+
+            // Populate pet dropdown
+            populatePetDropdown(pets, selectedPet.petId);
+            setupPetDropdownHandler(householdId);
+
+            // Update pet avatar
+            updatePetAvatar(selectedPet.petName);
+
+            // Save current pet and load activities
+            localStorage.setItem('petId', selectedPet.petId);
+            localStorage.setItem('lastPetId', selectedPet.petId);
+            await loadActivitiesForPet(householdId, selectedPet.petId);
+        } else {
+            // No pets in this household
+            const petDropdown = document.getElementById('pet-dropdown');
+            petDropdown.innerHTML = '<option>No pets yet</option>';
+            updatePetAvatar('No Pet');
+            document.getElementById('activity-log').innerHTML = '';
         }
     } catch (error) {
         console.error('Failed to load pets:', error);
     }
+}
 
+/**
+ * Populates the pet dropdown with pets from the selected household
+ */
+function populatePetDropdown(pets, selectedPetId) {
+    const petDropdown = document.getElementById('pet-dropdown');
+    if (!petDropdown) return;
+
+    petDropdown.innerHTML = '';
+    pets.forEach(pet => {
+        const option = document.createElement('option');
+        option.value = pet.petId;
+        option.textContent = pet.petName;
+        if (pet.petId == selectedPetId) {
+            option.selected = true;
+        }
+        petDropdown.appendChild(option);
+    });
+}
+
+/**
+ * Sets up the pet dropdown change handler
+ */
+function setupPetDropdownHandler(householdId) {
+    const petDropdown = document.getElementById('pet-dropdown');
+    if (!petDropdown) return;
+
+    // Remove existing listeners by cloning
+    const newDropdown = petDropdown.cloneNode(true);
+    petDropdown.parentNode.replaceChild(newDropdown, petDropdown);
+
+    newDropdown.addEventListener('change', async (e) => {
+        const petId = e.target.value;
+        const petName = e.target.options[e.target.selectedIndex].text;
+
+        localStorage.setItem('petId', petId);
+        localStorage.setItem('lastPetId', petId);
+
+        updatePetAvatar(petName);
+        await loadActivitiesForPet(householdId, petId);
+    });
+}
+
+/**
+ * Updates the pet avatar display
+ */
+function updatePetAvatar(petName) {
+    const petProfilePicture = document.getElementById('pet-avatar-name');
+    if (petProfilePicture) {
+        petProfilePicture.textContent = petName;
+    }
+}
+
+/**
+ * Loads activities for a specific pet
+ */
+async function loadActivitiesForPet(householdId, petId) {
+    const userId = localStorage.getItem('userId');
+    const today = new Date();
+    const { start, end } = getDayRange(today);
+
+    try {
+        const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+        displayActivityLog(activities);
+    } catch (error) {
+        console.error('Failed to load activities:', error);
+    }
 }
 
 //------------"ADD PET" MENU CARD FUNCTIONALITY + HELPER FUNCTIONS -------------------
@@ -290,7 +426,7 @@ function joinHouseholdCardFunctionality(){
 // USED TO DETERMINE WHAT TO DISPLAY/HIDE/UNHIDE
  */
 
-function openModal(contentType){
+function openModal(contentType, data = null){
     const content = document.getElementById('modal-content');
 
     const closeModalButton = document.getElementById('modal-close');
@@ -322,22 +458,25 @@ function openModal(contentType){
     content.innerHTML = `
       <h2 class="text-center">Your pet has been added!</h2>
       <p class="text-small mb-md">What would you like to do next?</p>
-      <button type="click" id="start-logging-activities">Start logging activities></button>
-      <button type="click">Invite others></button>
+      <button type="click" class="modal-btn" id="start-logging-activities">Start logging activities</button>
+      <button type="click" class="modal-btn btn-secondary">Invite others</button>
     `;
     document.getElementById('modal-close').classList.add('hidden');
 
     const startLoggingActivitiesBtn = document.getElementById('start-logging-activities');
     startLoggingActivitiesBtn.addEventListener('click', async (e) => {
         document.getElementById('modal-overlay').classList.add('hidden');
-        const userId = localStorage.getItem('userId');
-        const householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
-        const pets = await apiCall(`/api/pets/${householdId}`);
-        if (pets.length > 0) {
-        displayPets(pets);
-        localStorage.setItem('petId', pets[0].petId);
-        // Load activities for today...
-            }
+        document.getElementById('modal-close').classList.remove('hidden');
+
+        const userHouseholds = JSON.parse(localStorage.getItem('households')) || [];
+        const householdId = userHouseholds[0].householdId;
+
+        // Populate household dropdown
+        populateHouseholdDropdown(userHouseholds, householdId);
+        setupHouseholdDropdownHandler();
+
+        // Load pets and show active state
+        await loadPetsForHousehold(householdId);
         });
     }
 
@@ -401,9 +540,195 @@ function openModal(contentType){
             console.error('Failed to :', error);
         }
     });
-    document.getElementById('modal-overlay').classList.remove('hidden');        
+    document.getElementById('modal-overlay').classList.remove('hidden');
     }
 
+    if(contentType === 'edit-activity'){
+        const activity = data; // data parameter contains the activity object
+
+        // Helper to show main edit options
+        function showEditOptions() {
+            content.innerHTML = `
+                <h2 class="text-center">Edit Activity</h2>
+                <p class="text-small mb-md">What would you like to do with this activity?</p>
+                <div class="edit-activity-options">
+                    <button class="modal-btn btn-danger" id="btn-delete-activity">Delete Activity</button>
+                    <button class="modal-btn" id="btn-change-time">Change Time</button>
+                    <button class="modal-btn" id="btn-change-type">Change Activity Type</button>
+                </div>
+                <div id="edit-activity-form-container"></div>
+            `;
+            attachEditListeners();
+        }
+
+        // Helper to show delete confirmation
+        function showDeleteConfirmation() {
+            content.innerHTML = `
+                <h2 class="text-center">Delete Activity</h2>
+                <p class="text-small mb-md">Are you sure you want to delete this activity? This cannot be undone.</p>
+                <div class="edit-activity-options">
+                    <button class="modal-btn btn-danger" id="btn-confirm-delete">Yes, Delete</button>
+                    <button class="modal-btn btn-secondary" id="btn-back">Back</button>
+                </div>
+            `;
+
+            document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+                try {
+                    await apiCall(`/api/activity/${activity.activityId}?userId=${localStorage.getItem('userId')}`, {
+                        method: 'DELETE'
+                    });
+                    document.getElementById('modal-overlay').classList.add('hidden');
+                    await refreshActivityLog();
+                } catch (error) {
+                    console.error('Failed to delete activity:', error);
+                }
+            });
+
+            document.getElementById('btn-back').addEventListener('click', () => {
+                showEditOptions();
+            });
+        }
+
+        // Attach listeners to edit option buttons
+        function attachEditListeners() {
+            // Delete Activity - show confirmation
+            document.getElementById('btn-delete-activity').addEventListener('click', () => {
+                showDeleteConfirmation();
+            });
+
+        // Change Time
+        document.getElementById('btn-change-time').addEventListener('click', () => {
+            const formContainer = document.getElementById('edit-activity-form-container');
+            const currentTime = new Date(activity.activityTimestamp);
+            const timeValue = currentTime.toTimeString().slice(0, 5); // HH:MM format
+
+            formContainer.innerHTML = `
+                <form id="change-time-form" class="mt-md">
+                    <label>New Time</label>
+                    <input type="time" name="newTime" value="${timeValue}" required>
+                    <button type="submit" class="modal-btn">Update Time</button>
+                </form>
+            `;
+
+            document.getElementById('change-time-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newTime = document.querySelector('input[name="newTime"]').value;
+
+                // Combine original date with new time
+                const originalDate = new Date(activity.activityTimestamp);
+                const [hours, minutes] = newTime.split(':');
+                originalDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+                try {
+                    await apiCall(`/api/activity/${activity.activityId}/time`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            userId: parseInt(localStorage.getItem('userId')),
+                            newTimestamp: originalDate.toISOString()
+                        })
+                    });
+                    document.getElementById('modal-overlay').classList.add('hidden');
+                    await refreshActivityLog();
+                } catch (error) {
+                    console.error('Failed to update time:', error);
+                    alert('Failed to update time');
+                }
+            });
+        });
+
+        // Change Type
+        document.getElementById('btn-change-type').addEventListener('click', () => {
+            const formContainer = document.getElementById('edit-activity-form-container');
+            formContainer.innerHTML = `
+                <form id="change-type-form" class="mt-md">
+                    <label>New Activity Type</label>
+                    <select name="newType" required>
+                        <option value="FED" ${activity.activityType === 'FED' ? 'selected' : ''}>Fed</option>
+                        <option value="WALKED" ${activity.activityType === 'WALKED' ? 'selected' : ''}>Walked</option>
+                        <option value="PEE" ${activity.activityType === 'PEE' ? 'selected' : ''}>Pee</option>
+                        <option value="POOP" ${activity.activityType === 'POOP' ? 'selected' : ''}>Poop</option>
+                    </select>
+                    <button type="submit" class="modal-btn">Update Type</button>
+                </form>
+            `;
+
+            document.getElementById('change-type-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newType = document.querySelector('select[name="newType"]').value;
+
+                try {
+                    await apiCall(`/api/activity/${activity.activityId}/type`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            userId: parseInt(localStorage.getItem('userId')),
+                            newType: newType
+                        })
+                    });
+                    document.getElementById('modal-overlay').classList.add('hidden');
+                    await refreshActivityLog();
+                } catch (error) {
+                    console.error('Failed to update type:', error);
+                }
+            });
+        });
+        } // end attachEditListeners
+
+        // Initialize with edit options view
+        showEditOptions();
+        document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    if(contentType === 'log-activity-confirm'){
+        const { activityType, petName, timeString } = data;
+
+        // Get activity verb for display
+        const activityVerbs = {
+            'FED': 'was fed',
+            'WALKED': 'went for a walk',
+            'PEE': 'peed',
+            'POOP': 'pooped'
+        };
+        const activityVerb = activityVerbs[activityType] || activityType.toLowerCase();
+
+        content.innerHTML = `
+            <h2 class="text-center">Log Activity</h2>
+            <p class="text-center mb-md">Log that <strong>${petName}</strong> ${activityVerb} @ ${timeString}?</p>
+            <div class="edit-activity-options">
+                <button class="modal-btn" id="btn-confirm-log">Confirm</button>
+                <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
+            </div>
+        `;
+
+        document.getElementById('btn-confirm-log').addEventListener('click', async () => {
+            document.getElementById('modal-overlay').classList.add('hidden');
+            await logActivity(activityType);
+        });
+
+        document.getElementById('btn-cancel-log').addEventListener('click', () => {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        });
+
+        document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+}
+
+/**
+ * Helper function to refresh the activity log after edits
+ */
+async function refreshActivityLog() {
+    const householdDropdown = document.getElementById('household-dropdown');
+    const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+    const petId = localStorage.getItem('petId');
+    const userId = localStorage.getItem('userId');
+
+    // Get current displayed date from the date span
+    const dateSpan = document.getElementById('activity-date');
+    const displayedDate = new Date(dateSpan.textContent);
+    const { start, end } = getDayRange(displayedDate);
+
+    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+    displayActivityLog(activities);
 }
 
 
@@ -417,21 +742,38 @@ function openModal(contentType){
 
 function setupActivityButtons() {
     const buttons = document.querySelectorAll('.activity-btn');
-    
+
     buttons.forEach(button => {
         button.addEventListener('click', () => {
             const activityType = button.dataset.type;  // reads data-type attribute
-            logActivity(activityType);
+            showLogActivityConfirmation(activityType);
         });
     });
+}
+
+function showLogActivityConfirmation(activityType) {
+    // Get pet name from dropdown
+    const petDropdown = document.getElementById('pet-dropdown');
+    const petName = petDropdown.options[petDropdown.selectedIndex]?.text || 'your pet';
+    const currentTime = new Date();
+    const timeString = currentTime.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    openModal('log-activity-confirm', { activityType, petName, timeString });
 }
 
 async function logActivity(activityType){
     const userId = localStorage.getItem('userId');
     const petId = localStorage.getItem('petId');
-    const householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
-    const activityTimestamp = new Date().toISOString();  // Single timestamp
+    // Use the currently selected household from dropdown
+    const householdDropdown = document.getElementById('household-dropdown');
+    const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+    const activityTimestamp = new Date().toISOString();
     const { start, end } = getDayRange(new Date());
+
     await apiCall(`/api/activity`, {
         method: 'POST',
         body: JSON.stringify({
@@ -440,33 +782,10 @@ async function logActivity(activityType){
             activityType: activityType,
             activityTimestamp: activityTimestamp
         })
-    } );
+    });
+
     const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
     displayActivityLog(activities);
-}
-
-/**
- * Displays the user's pets on the dashboard
- */
-function displayPets(pets) {
-    // Hide empty state, show active state
-    const emptyState = document.getElementById('empty-state');
-    const activeState = document.getElementById('active-state');
-    document.getElementById('welcome-message').classList.add('hidden');
-
-    if (emptyState) emptyState.style.display = 'none';
-    if (activeState) {
-        activeState.classList.remove('hidden');
-    }
-
-    const petDropdown = document.getElementById('pet-dropdown');
-    const option = document.createElement('option');
-    option.textContent = pets[0].petName;
-    petDropdown.appendChild(option);
-
-    const petProfilePicture = document.getElementById('pet-avatar-name');
-    petProfilePicture.textContent = pets[0].petName;
-
 }
 
 function displayActivityLog(activities){
@@ -476,21 +795,32 @@ function displayActivityLog(activities){
         const log = document.createElement('li');
         log.className = 'activity-entry';
 
+        // Edit button (only shown for activities logged by current user)
+        if(activity.loggedByUserId === parseInt(localStorage.getItem('userId'), 10)){
+            const editBtn = document.createElement('button');
+            editBtn.className = 'activity-edit-btn';
+            editBtn.textContent = '📝';
+            editBtn.addEventListener('click', () => {
+                openModal('edit-activity', activity);
+            });
+            log.appendChild(editBtn);
+        }
+
         const icon = getActivityIcon(activity.activityType);
         const text = document.createElement('span');
 
         if(activity.activityType == "FED"){
-            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
+            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
         }
         if(activity.activityType == "WALKED"){
-            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
+            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
         }
         if(activity.activityType == "POOP"){
-            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
+            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
         }
         if(activity.activityType == "PEE"){
-            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;            
-        }        
+            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
+        }
 
         log.appendChild(icon);
         log.appendChild(text);
@@ -515,9 +845,12 @@ function setupDateDisplay() {
     previousDayButton.addEventListener('click', async (e) => {
         today.setDate(today.getDate() - 1);
         const { start, end } = getDayRange(today);
-        
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${JSON.parse(localStorage.getItem('households'))[0].householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
-        
+        // Use the currently selected household from dropdown
+        const householdDropdown = document.getElementById('household-dropdown');
+        const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
@@ -525,14 +858,19 @@ function setupDateDisplay() {
         });
         displayActivityLog(changedActivityLog);
     })
+
     nextDayButton.addEventListener('click', async (e) => {
         if(today.toDateString() === rememberCurrentDay.toDateString()){
             return;
         }
         today.setDate(today.getDate() + 1);
         const { start, end } = getDayRange(today);
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${JSON.parse(localStorage.getItem('households'))[0].householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
-        dateSpan.textContent = today.toLocaleDateString('en-CA', {
+        // Use the currently selected household from dropdown
+        const householdDropdown = document.getElementById('household-dropdown');
+        const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+        dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
             year: 'numeric'
@@ -591,16 +929,6 @@ function formatLocalDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-
-function setUpHouseholdHeaderButton(){
-    const householdButton = document.getElementById('btn-households');
-    householdButton.addEventListener('click', (e) => {
-        window.location.href = '/households.html';   
-
-    });
-
-}
-
 /**
  * Gets the start and end of day as ISO timestamps for API queries
  * @param {Date} date - The date to get range for
@@ -652,8 +980,12 @@ async function apiCall(endpoint, options = {}) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Parse and return JSON response
-        return await response.json();
+        // Handle empty responses (like DELETE which returns 204 No Content)
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        }
+        return null;
     } catch (error) {
         console.error('API call failed:', error);
         throw error;

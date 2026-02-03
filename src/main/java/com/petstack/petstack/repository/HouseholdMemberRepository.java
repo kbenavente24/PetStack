@@ -14,4 +14,10 @@ import java.util.Optional;
 @Repository
 public interface HouseholdMemberRepository extends JpaRepository<HouseholdMember, HouseholdMemberId>{
 
+
+Optional<HouseholdMember> findByUserUserIdAndHouseholdHouseholdId(Integer userId, Integer householdId);
+
+List<HouseholdMember> findByHouseholdHouseholdId(Integer householdId);
+
+
 }

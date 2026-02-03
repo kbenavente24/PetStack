@@ -2,16 +2,19 @@ package com.petstack.petstack.service;
 
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service  // Tells Spring: "Create and manage an instance of this class"
 public class UserService {
 
     private final UserRepository userRepository;  // Our database access
+    private final PasswordEncoder passwordEncoder;  // For hashing passwords
 
-    // Constructor injection - Spring will automatically pass in UserRepository
-    public UserService(UserRepository userRepository) {
+    // Constructor injection - Spring will automatically pass in dependencies
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -23,7 +26,9 @@ public class UserService {
             throw new RuntimeException("An account already exists for this email!");
         }
 
-        User user = new User(email, password, displayName);
+        // Hash the password before storing
+        String hashedPassword = passwordEncoder.encode(password);
+        User user = new User(email, hashedPassword, displayName);
         userRepository.save(user);
         return user;
     }

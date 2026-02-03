@@ -1,12 +1,21 @@
 package com.petstack.petstack.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
-import com.petstack.petstack.model.Household;
-import com.petstack.petstack.service.HouseholdMemberService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.petstack.petstack.dto.response.HouseholdMemberResponse;
+import com.petstack.petstack.dto.response.UserResponse.HouseholdInfo;
+import com.petstack.petstack.model.Household;
+import com.petstack.petstack.model.HouseholdMember;
+import com.petstack.petstack.service.HouseholdMemberService;
+
 
 
 @RestController
@@ -18,12 +27,23 @@ public class HouseholdMemberController {
         this.householdMemberService = householdMemberService;
     }
 
+    //This is an endpoint intended for the event of a user joining a household. 
+    //This is similar to the household controller but, obviously, cant be used in the instances where
+    //a user joins because it would create an unintended household.
     @PostMapping
     public HouseholdInfo registerHouseholdMember(@RequestBody RegisterHouseholdMemberRequest request) {
         Household household = householdMemberService.registerHouseholdMember(request.getUserId(), request.getInviteCode(), request.getRole());
-
-        return new HouseholdInfo(household, request.getRole());
+        HouseholdMember householdMember = householdMemberService.getHouseholdMemberByUserIdAndHouseholdId(request.getUserId(), household.getHouseholdId());
+        return new HouseholdInfo(household, householdMember);
     }
+
+    @GetMapping("/{householdId}")
+    public List<HouseholdMemberResponse> getHouseholdMembers(
+            @PathVariable Integer householdId,
+            @RequestParam Integer currentUserId) {
+        return householdMemberService.getHouseholdMembersOrdered(currentUserId, householdId);
+    }
+    
 
     public static class RegisterHouseholdMemberRequest {
         private Integer userId;
@@ -46,10 +66,10 @@ public class HouseholdMemberController {
         private String role;
         private String inviteCode;
 
-        public HouseholdInfo(Household household,  String role){
+        public HouseholdInfo(Household household, HouseholdMember householdMember){
             this.householdId = household.getHouseholdId();
             this.householdName = household.getHouseholdName();
-            this.role = role;
+            this.role = householdMember.getUserRole();
             this.inviteCode = household.getInviteCode();
         }
 

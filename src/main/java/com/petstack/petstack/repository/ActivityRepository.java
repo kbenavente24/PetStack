@@ -14,11 +14,6 @@ import java.util.List;
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Integer>{
 
-    List<Activity> findByActivityDateAndPetPetId(
-        LocalDate activityDate,
-        Integer petId
-    );
-
     @Query("SELECT a FROM Activity a WHERE a.pet.petId = :petId AND a.activityTimestamp >= :start AND a.activityTimestamp < :end")
     List<Activity> findActivitiesForDateRange(
         @Param("petId") Integer petId, 
