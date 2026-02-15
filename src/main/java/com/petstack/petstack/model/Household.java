@@ -7,12 +7,6 @@ import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Household Entity - Maps to the "household" table
- *
- * Represents a household/family group that shares pet ownership.
- * Multiple users can belong to a household.
- */
 @Entity
 @Table(name = "household")
 public class Household {
@@ -38,23 +32,9 @@ public class Household {
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Pet> pets = new HashSet<>();
 
-    /**
-     * One-to-Many: Household -> HouseholdMembers
-     *
-     * CHANGED FROM @ManyToMany!
-     *
-     * Because household_members table has user_role column,
-     * we created HouseholdMember entity to represent memberships.
-     *
-     * Now instead of "Household has many Users" (simple @ManyToMany),
-     * we have "Household has many Memberships" (each with a user and role).
-     *
-     * To get just the User objects, use getMembers() helper method below.
-     */
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<HouseholdMember> householdMemberships = new HashSet<>();
 
-    // Constructors
     public Household() {
     }
 
@@ -63,7 +43,6 @@ public class Household {
         this.inviteCode = inviteCode;
     }
 
-    // Getters and Setters
     public Integer getHouseholdId() {
         return householdId;
     }
@@ -112,12 +91,6 @@ public class Household {
         this.householdMemberships = householdMemberships;
     }
 
-    /**
-     * Convenience method: Get just the User objects (without membership details)
-     *
-     * This extracts the User from each HouseholdMember.
-     * Useful when you don't care about the user_role.
-     */
     public Set<User> getMembers() {
         Set<User> members = new HashSet<>();
         for (HouseholdMember membership : householdMemberships) {

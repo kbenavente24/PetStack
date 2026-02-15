@@ -52,13 +52,6 @@ public class ActivityService {
 
 
 
-        //if(!household.getMembers().contains(user)){
-        //    throw new RuntimeException("User does not have access to this household");
-        //}
-
-        // TODO: Optimization - This ownership check triggers a lazy load of household's entire pets collection (extra DB query).
-        // Consider replacing with: a different repository method
-        // which does a single efficient EXISTS query instead of loading all pet objects.
         if(!household.getPets().contains(pet)){
             throw new RuntimeException("Pet for household not found!");
         }

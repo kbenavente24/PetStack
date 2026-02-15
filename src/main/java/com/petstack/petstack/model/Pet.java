@@ -8,13 +8,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Pet Entity - Maps to the "pet" table
- *
- * Represents a pet in the system.
- * Pets can have multiple owners (many-to-many with User).
- * Pets can have multiple activities logged for them (one-to-many with Activity).
- */
 @Entity
 @Table(name = "pet")
 public class Pet {
@@ -29,10 +22,6 @@ public class Pet {
     @Column(name = "pet_name", nullable = false, length = 100)
     private String petName;
 
-    /**
-     * LocalDate is used for dates (not time).
-     * JPA automatically maps LocalDate to PostgreSQL's DATE type.
-     */
     @Column(name = "pet_birthdate")
     private LocalDate petBirthdate;
 
@@ -44,61 +33,29 @@ public class Pet {
     @Column(name = "pet_gender", length = 20)
     private String petGender;
 
-    /**
-     * columnDefinition = "TEXT" tells JPA this column is TEXT type in PostgreSQL
-     * (not VARCHAR with a length limit)
-     */
     @Column(name = "owner_notes", columnDefinition = "TEXT")
     private String ownerNotes;
 
-    /**
-     * Many-to-One: Pet -> Household
-     *
-     * Many pets can belong to one household.
-     * The pet table has a household_id foreign key column.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "household_id")
     private Household household;
 
-    /**
-     * One-to-Many: Pet -> Activities
-     *
-     * One pet can have many activities logged for them.
-     *
-     * mappedBy = "pet": The Activity entity has a "pet" field that owns this relationship.
-     * cascade = CascadeType.ALL: If we delete a pet, delete all their activities too.
-     * orphanRemoval = true: If we remove an activity from this set, delete it from database.
-     */
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Activity> activities = new HashSet<>();
 
-    // ============ CONSTRUCTORS ============
-
-    /**
-     * Default constructor - REQUIRED by JPA
-     */
     public Pet() {
     }
 
-    /**
-     * Constructor for creating a new pet with just a name
-     */
     public Pet(String petName, Household household) {
         this.petName = petName;
         this.household = household;
     }
 
-    /**
-     * Constructor for creating a new pet with common fields
-     */
     public Pet(String petName, LocalDate petBirthdate, String petSpecies) {
         this.petName = petName;
         this.petBirthdate = petBirthdate;
         this.petSpecies = petSpecies;
     }
-
-    // ============ GETTERS AND SETTERS ============
 
     public Integer getPetId() {
         return petId;
@@ -164,8 +121,6 @@ public class Pet {
         this.activities = activities;
     }
 
-    // ============ UTILITY METHODS ============
-
     @Override
     public String toString() {
         return "Pet{" +
@@ -175,22 +130,6 @@ public class Pet {
                 '}';
     }
 
-    /**
-     * LEARNING NOTE: equals() and hashCode() for JPA entities
-     *
-     * equals() determines if two Pet objects represent the same entity.
-     * We compare by petId (primary key) - if two Pets have the same petId, they're equal.
-     *
-     * hashCode() returns a constant (31) instead of using petId. Why?
-     * - petId is null before the entity is saved to the database
-     * - If hashCode used petId, it would change after saving
-     * - HashSets store objects in "buckets" based on hashCode
-     * - If hashCode changes, the object is in the wrong bucket and becomes "lost"
-     * - Constant hashCode = slower (all Pets in one bucket) but always correct
-     *
-     * Contract: if equals() returns true, hashCode() MUST return the same value.
-     * But same hashCode does NOT mean equals() is true (multiple objects can share a bucket).
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

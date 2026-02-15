@@ -63,8 +63,6 @@ async function handleChangeDisplayName(e) {
         return;
     }
 
-    // TODO: Add API endpoint to update display name on the backend
-    // For now, just update localStorage
     localStorage.setItem('displayName', newDisplayName);
     document.getElementById('profile-display-name').textContent = newDisplayName;
 
