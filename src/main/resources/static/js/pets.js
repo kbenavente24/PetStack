@@ -72,6 +72,7 @@ export function setupPetDropdownHandler(householdId) {
 
         updatePetAvatar(petName);
         await loadActivitiesForPet(householdId, petId);
+
     });
 }
 
@@ -111,7 +112,6 @@ function showAddPetModal(onPetAdded) {
         e.preventDefault();
 
         const data = Object.fromEntries(new FormData(form));
-        data.userId = localStorage.getItem('userId');
         data.householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
 
         try {

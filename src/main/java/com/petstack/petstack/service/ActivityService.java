@@ -10,9 +10,6 @@ import com.petstack.petstack.repository.UserRepository;
 import com.petstack.petstack.repository.PetRepository;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -31,9 +28,9 @@ public class ActivityService {
         this.petRepository = petRepository;
     }
 
-    public Activity logActivity(Integer userId, Integer petId, ActivityType activityType, Instant activityTimestamp){
+    public Activity logActivity(String email, Integer petId, ActivityType activityType, Instant activityTimestamp){
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
 
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found!"));
 
@@ -45,12 +42,9 @@ public class ActivityService {
 
     }
 
-    public List<Activity> getActivitiesForSpecificDate(Instant start, Instant end, Integer householdId, Integer userId, Integer petId){
-        User user =  userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+    public List<Activity> getActivitiesForSpecificDate(Instant start, Instant end, Integer householdId, String email, Integer petId){
         Pet pet =  petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found!"));
         Household household = householdRepository.findById(householdId).orElseThrow(() -> new RuntimeException("Household not found!"));
-
-
 
         if(!household.getPets().contains(pet)){
             throw new RuntimeException("Pet for household not found!");
@@ -59,23 +53,23 @@ public class ActivityService {
         return activityRepository.findActivitiesForDateRange(petId, start, end);
     }
 
-    public void deleteActivity(Integer activityId, Integer userId) {
+    public void deleteActivity(Integer activityId, String email) {
         Activity activity = activityRepository.findById(activityId)
             .orElseThrow(() -> new RuntimeException("Activity not found!"));
 
         // Only allow the user who logged the activity to delete it
-        if (!activity.getUser().getUserId().equals(userId)) {
+        if (!activity.getUser().getEmail().equals(email)) {
             throw new RuntimeException("You can only delete activities you logged!");
         }
 
         activityRepository.delete(activity);
     }
 
-    public Activity updateActivityTime(Integer activityId, Integer userId, Instant newTimestamp) {
+    public Activity updateActivityTime(Integer activityId, String email, Instant newTimestamp) {
         Activity activity = activityRepository.findById(activityId)
             .orElseThrow(() -> new RuntimeException("Activity not found!"));
 
-        if (!activity.getUser().getUserId().equals(userId)) {
+        if (!activity.getUser().getEmail().equals(email)) {
             throw new RuntimeException("You can only edit activities you logged!");
         }
 
@@ -83,11 +77,11 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public Activity updateActivityType(Integer activityId, Integer userId, ActivityType newType) {
+    public Activity updateActivityType(Integer activityId, String email, ActivityType newType) {
         Activity activity = activityRepository.findById(activityId)
             .orElseThrow(() -> new RuntimeException("Activity not found!"));
 
-        if (!activity.getUser().getUserId().equals(userId)) {
+        if (!activity.getUser().getEmail().equals(email)) {
             throw new RuntimeException("You can only edit activities you logged!");
         }
 

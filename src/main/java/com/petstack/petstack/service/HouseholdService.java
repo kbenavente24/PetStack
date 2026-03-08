@@ -23,8 +23,8 @@ public class HouseholdService {
         this.userRepository = userRepository;
     }
 
-    public Household createHousehold(Integer userId, String householdName, String role){
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+    public Household createHousehold(String email, String householdName, String role){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
 
         Household household = new Household();
 

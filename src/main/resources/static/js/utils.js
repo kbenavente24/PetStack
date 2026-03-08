@@ -1,11 +1,14 @@
 export async function apiCall(endpoint, options = {}) {
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    const headers = {
+        'Content-Type': 'application/json',
     };
 
-    const fetchOptions = { ...defaultOptions, ...options };
+    const token = localStorage.getItem('token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const fetchOptions = { ...options, headers };
 
     try {
         const response = await fetch(endpoint, fetchOptions);
@@ -54,9 +57,21 @@ export function getDayRange(date) {
     };
 }
 
+export function getOrdinalSuffix(date) {
+    if(date === 1 || date === 21 || date === 31){
+        return date + 'st';
+    } else if(date === 2 || date === 22){
+        return date + 'nd';
+    } else if (date === 3 || date === 23){
+        return date + 'rd';
+    } else {
+        return date + 'th';
+    }
+}
+
 export function getActivityIcon(activityType) {
     const iconMap = {
-        'FED': { type: 'image', value: 'images/food-icon.png' },
+        'FED': { type: 'image', value: 'images/food-bowl.png' },
         'WALKED': { type: 'image', value: 'images/walking-icon.png' },
         'PEE': { type: 'image', value: 'images/pee.png' },
         'POOP': { type: 'image', value: 'images/poop.png' }

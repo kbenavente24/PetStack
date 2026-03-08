@@ -1,5 +1,8 @@
-import { apiCall, getDayRange, formatTime12Hour, getActivityIcon } from './utils.js';
+import { apiCall, getDayRange, formatTime12Hour, getActivityIcon, getOrdinalSuffix } from './utils.js';
 import { showModal, hideModal, setModalContent } from './modals.js';
+
+
+let today = new Date();
 
 export function setupActivityButtons() {
     const buttons = document.querySelectorAll('.activity-btn');
@@ -13,15 +16,10 @@ export function setupActivityButtons() {
 }
 
 export function showLogActivityConfirmation(activityType) {
+
+    const currDate = new Date();
     const petDropdown = document.getElementById('pet-dropdown');
     const petName = petDropdown.options[petDropdown.selectedIndex]?.text || 'your pet';
-    const currentTime = new Date();
-    const timeString = currentTime.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-    });
-
     const activityVerbs = {
         'FED': 'was fed',
         'WALKED': 'went for a walk',
@@ -30,46 +28,98 @@ export function showLogActivityConfirmation(activityType) {
     };
     const activityVerb = activityVerbs[activityType] || activityType.toLowerCase();
 
-    setModalContent(`
-        <h2 class="text-center">Log Activity</h2>
-        <p class="text-center mb-md">Log that <strong>${petName}</strong> ${activityVerb} @ ${timeString}?</p>
-        <div class="edit-activity-options">
-            <button class="modal-btn" id="btn-confirm-log">Confirm</button>
-            <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
-        </div>
-    `);
+    if(currDate.toISOString().split('T')[0] == today.toISOString().split('T')[0]) {
+        const currDate = new Date();
+        const timeString = currDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
 
-    document.getElementById('btn-confirm-log').addEventListener('click', async () => {
-        hideModal();
-        await logActivity(activityType);
-    });
+        setModalContent(`
+            <h2 class="text-center">Log Activity</h2>
+            <p class="text-center mb-md">Log that <strong>${petName}</strong> ${activityVerb} @ ${timeString}?</p>
+            <div class="edit-activity-options">
+                <button class="modal-btn" id="btn-confirm-log">Confirm</button>
+                <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
+            </div>
+        `);
 
-    document.getElementById('btn-cancel-log').addEventListener('click', () => {
-        hideModal();
-    });
+        document.getElementById('btn-confirm-log').addEventListener('click', async () => {
+            hideModal();
+            await logActivity(activityType);
+        });
 
-    showModal();
+        document.getElementById('btn-cancel-log').addEventListener('click', () => {
+            hideModal();
+        });
+
+        showModal();
+
+    
+    } else {
+        const date = getOrdinalSuffix(today.getDate());
+        setModalContent(`
+            <h2 class="text-center">Log Activity For Past Day</h2>
+            <p class="text-center mb-md">Select time that <strong>${petName}</strong> ${activityVerb} on ${today.toLocaleDateString('en-US', { weekday: 'long' })} 
+            the ${date}</p>
+            <div class="edit-activity-options">
+                <button class="modal-btn" id="btn-confirm-log">Confirm</button>
+                <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
+            </div>
+        `);
+
+        document.getElementById('btn-confirm-log').addEventListener('click', async () => {
+            hideModal();
+            await logActivity(activityType);
+        });
+
+        document.getElementById('btn-cancel-log').addEventListener('click', () => {
+            hideModal();
+        });
+
+        showModal();
+    }
+
 }
 
 export async function logActivity(activityType) {
-    const userId = localStorage.getItem('userId');
     const petId = localStorage.getItem('petId');
     const householdDropdown = document.getElementById('household-dropdown');
     const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
     const activityTimestamp = new Date().toISOString();
-    const { start, end } = getDayRange(new Date());
+    let { start, end } = getDayRange(new Date());
+    console.log(start);
+    console.log(end);
 
-    await apiCall(`/api/activity`, {
-        method: 'POST',
-        body: JSON.stringify({
-            userId: userId,
-            petId: petId,
-            activityType: activityType,
-            activityTimestamp: activityTimestamp
-        })
-    });
+    /*
 
-    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+    check if we're viewing today's actual date or a previous day (meaning user went back some amount of time and pressed a log activity button)
+    */
+    const currMonthDayYear = new Date();
+    if(currMonthDayYear.toISOString().split('T')[0] !== today.toISOString().split('T')[0]){
+        ({start, end} = getDayRange(today));
+        console.log(start);
+        console.log(end);
+        await apiCall(`/api/activity`, {
+            method: 'POST',
+            body: JSON.stringify({
+                petId: petId,
+                activityType: activityType,
+                activityTimestamp: today.toISOString()
+            })
+        });
+    } else {
+        await apiCall(`/api/activity`, {
+            method: 'POST',
+            body: JSON.stringify({
+                petId: petId,
+                activityType: activityType,
+                activityTimestamp: activityTimestamp
+            })
+        });
+    }
+    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
     displayActivityLog(activities);
 }
 
@@ -113,30 +163,43 @@ export function displayActivityLog(activities) {
     }
 }
 
+/*
+
+need to update the day on frontend as well 
+*/
+
+
 export async function loadActivitiesForPet(householdId, petId) {
-    const userId = localStorage.getItem('userId');
-    const today = new Date();
+    today = new Date();
     const { start, end } = getDayRange(today);
 
     try {
-        const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+        const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
         displayActivityLog(activities);
     } catch (error) {
         console.error('Failed to load activities:', error);
     }
+
+    const dateSpan = document.getElementById('activity-date');
+    dateSpan.textContent = today.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
+
 }
 
 export async function refreshActivityLog() {
     const householdDropdown = document.getElementById('household-dropdown');
     const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
     const petId = localStorage.getItem('petId');
-    const userId = localStorage.getItem('userId');
 
     const dateSpan = document.getElementById('activity-date');
     const displayedDate = new Date(dateSpan.textContent);
     const { start, end } = getDayRange(displayedDate);
 
-    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${userId}&petId=${petId}`);
+    const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
     displayActivityLog(activities);
 }
 
@@ -145,7 +208,7 @@ export function setupDateDisplay() {
     if (!dateSpan) return;
 
     const rememberCurrentDay = new Date();
-    const today = new Date();
+    today = new Date();
     dateSpan.textContent = today.toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
@@ -161,7 +224,7 @@ export function setupDateDisplay() {
         const householdDropdown = document.getElementById('household-dropdown');
         const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
 
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${localStorage.getItem('petId')}`);
 
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
@@ -180,7 +243,7 @@ export function setupDateDisplay() {
         const householdDropdown = document.getElementById('household-dropdown');
         const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
 
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&userId=${localStorage.getItem('userId')}&petId=${localStorage.getItem('petId')}`);
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${localStorage.getItem('petId')}`);
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
@@ -217,7 +280,7 @@ function showEditActivityModal(activity) {
 
         document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
             try {
-                await apiCall(`/api/activity/${activity.activityId}?userId=${localStorage.getItem('userId')}`, {
+                await apiCall(`/api/activity/${activity.activityId}`, {
                     method: 'DELETE'
                 });
                 hideModal();
@@ -262,7 +325,6 @@ function showEditActivityModal(activity) {
                     await apiCall(`/api/activity/${activity.activityId}/time`, {
                         method: 'PUT',
                         body: JSON.stringify({
-                            userId: parseInt(localStorage.getItem('userId')),
                             newTimestamp: originalDate.toISOString()
                         })
                     });
@@ -298,7 +360,6 @@ function showEditActivityModal(activity) {
                     await apiCall(`/api/activity/${activity.activityId}/type`, {
                         method: 'PUT',
                         body: JSON.stringify({
-                            userId: parseInt(localStorage.getItem('userId')),
                             newType: newType
                         })
                     });

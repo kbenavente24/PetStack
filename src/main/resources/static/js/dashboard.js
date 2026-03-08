@@ -1,4 +1,3 @@
-import { setupSignupForm, setupLoginForm } from './auth.js';
 import { setupActivityButtons, setupDateDisplay } from './activities.js';
 import { loadPetsForHousehold, addPetCardFunctionality } from './pets.js';
 import {
@@ -9,17 +8,10 @@ import {
 } from './dashboard-households.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('PetStack loaded!');
-
-    setupSignupForm();
-    setupLoginForm();
     setupDashboard();
 });
 
 async function setupDashboard() {
-    const displayNameElement = document.getElementById('user-display-name');
-    if (!displayNameElement) return;
-
     setupActivityButtons();
     createHouseholdCardFunctionality();
     joinHouseholdCardFunctionality();
@@ -33,18 +25,19 @@ async function setupDashboard() {
         await loadPetsForHousehold(householdId);
     });
 
-    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
     const displayName = localStorage.getItem('displayName');
 
-    if (!userId) {
+    if (!token) {
         window.location.href = '/login.html';
         return;
     }
 
-    displayNameElement.textContent = displayName;
+    document.getElementById('user-display-name').textContent = displayName;
 
     const userHouseholds = JSON.parse(localStorage.getItem('households')) || [];
     if (userHouseholds.length === 0) {
+        document.querySelector('.dashboard-main').classList.add('ready');
         return;
     }
 
@@ -58,4 +51,5 @@ async function setupDashboard() {
     setupHouseholdDropdownHandler();
 
     await loadPetsForHousehold(selectedHousehold.householdId);
+    document.querySelector('.dashboard-main').classList.add('ready');
 }

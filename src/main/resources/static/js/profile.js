@@ -1,3 +1,5 @@
+import { apiCall } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Profile page loaded!');
     setupProfilePage();
@@ -19,10 +21,13 @@ function setupProfilePage() {
     // Modal close button
     const closeModalBtn = document.getElementById('modal-close');
     closeModalBtn.addEventListener('click', closeModal);
+
+    document.querySelector('.dashboard-main').classList.add('ready');
 }
 
 function handleSignOut() {
     // Clear all user data from localStorage
+    localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('displayName');
     localStorage.removeItem('households');
@@ -65,7 +70,16 @@ async function handleChangeDisplayName(e) {
 
     localStorage.setItem('displayName', newDisplayName);
     document.getElementById('profile-display-name').textContent = newDisplayName;
+    try {
+        await apiCall(`/api/users/me/updatename?newDisplayName=${newDisplayName}`, {
+            method: 'PUT'
+        })
 
+        console.log('worked');
+
+    } catch (error) {
+        console.error('Failed to update name');
+    }
     closeModal();
 }
 

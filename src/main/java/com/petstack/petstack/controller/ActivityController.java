@@ -6,10 +6,9 @@ import com.petstack.petstack.model.ActivityType;
 import com.petstack.petstack.service.ActivityService;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,9 +23,10 @@ public class ActivityController {
     }
 
     @PostMapping
-    public ActivityResponse logActivity(@RequestBody CreateActivityRequest request) {
+    public ActivityResponse logActivity(@RequestBody CreateActivityRequest request, Authentication authentication) {
+        String email = authentication.getName();
         Activity activity = activityService.logActivity(
-            request.getUserId(),
+            email,
             request.getPetId(),
             request.getActivityType(),
             request.getActivityTimestamp()
@@ -35,68 +35,58 @@ public class ActivityController {
     }
 
     @GetMapping("/pet")
-    public List<ActivityResponse> getActivitiesForPet(@RequestParam Instant start, Instant end, @RequestParam Integer householdId, @RequestParam Integer userId, @RequestParam Integer petId){
-        List<Activity> activities = activityService.getActivitiesForSpecificDate(start, end, householdId, userId, petId);
+    public List<ActivityResponse> getActivitiesForPet(@RequestParam Instant start, Instant end, @RequestParam Integer householdId, @RequestParam Integer petId, Authentication authentication){
+        String email = authentication.getName();
+        List<Activity> activities = activityService.getActivitiesForSpecificDate(start, end, householdId, email, petId);
 
         return activities.stream().map(activity -> new ActivityResponse(activity)).toList();
     }
 
     @DeleteMapping("/{activityId}")
-    public void deleteActivity(@PathVariable Integer activityId, @RequestParam Integer userId) {
-        activityService.deleteActivity(activityId, userId);
+    public void deleteActivity(@PathVariable Integer activityId, Authentication authentication) {
+        String email = authentication.getName();
+        activityService.deleteActivity(activityId, email);
     }
 
     @PutMapping("/{activityId}/time")
-    public ActivityResponse updateActivityTime(@PathVariable Integer activityId, @RequestBody UpdateTimeRequest request) {
-        Activity activity = activityService.updateActivityTime(activityId, request.getUserId(), request.getNewTimestamp());
+    public ActivityResponse updateActivityTime(@PathVariable Integer activityId, @RequestBody UpdateTimeRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        Activity activity = activityService.updateActivityTime(activityId, email, request.getNewTimestamp());
         return new ActivityResponse(activity);
     }
 
     @PutMapping("/{activityId}/type")
-    public ActivityResponse updateActivityType(@PathVariable Integer activityId, @RequestBody UpdateTypeRequest request) {
-        Activity activity = activityService.updateActivityType(activityId, request.getUserId(), request.getNewType());
+    public ActivityResponse updateActivityType(@PathVariable Integer activityId, @RequestBody UpdateTypeRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        Activity activity = activityService.updateActivityType(activityId, email, request.getNewType());
         return new ActivityResponse(activity);
     }
 
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package
     public static class CreateActivityRequest {
-        private Integer householdId;
-        private Integer userId;
         private Integer petId;
         private ActivityType activityType;
         private Instant activityTimestamp;
 
-        // Getters and setters (required for JSON deserialization)
-        public Integer getHouseholdId() {return householdId; }
-        public Integer getUserId() { return userId; }
         public Integer getPetId() { return petId; }
         public ActivityType getActivityType() { return activityType; }
         private Instant getActivityTimestamp() { return activityTimestamp; }
-            // Setters
-        public void setUserId(Integer userId) { this.userId = userId; }
-        public void setHouseholdId(Integer householdId) {this.householdId = householdId; }
         public void setPetId(Integer petId) { this.petId = petId; }
         public void setActivityType(ActivityType activityType) { this.activityType = activityType; }
         public void setActivityTimestamp(Instant activityTimestamp) { this.activityTimestamp = activityTimestamp; }
     }
 
     public static class UpdateTimeRequest {
-        private Integer userId;
         private Instant newTimestamp;
 
-        public Integer getUserId() { return userId; }
-        public void setUserId(Integer userId) { this.userId = userId; }
         public Instant getNewTimestamp() { return newTimestamp; }
         public void setNewTimestamp(Instant newTimestamp) { this.newTimestamp = newTimestamp; }
     }
 
     public static class UpdateTypeRequest {
-        private Integer userId;
         private ActivityType newType;
 
-        public Integer getUserId() { return userId; }
-        public void setUserId(Integer userId) { this.userId = userId; }
         public ActivityType getNewType() { return newType; }
         public void setNewType(ActivityType newType) { this.newType = newType; }
     }

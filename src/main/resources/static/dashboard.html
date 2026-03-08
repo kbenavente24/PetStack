@@ -20,13 +20,13 @@
             <a href="dashboard.html" class="header-nav-btn active" title="Dashboard">📋</a>
             <a href="households.html" class="header-nav-btn" title="Households">🏠</a>
             <a href="profile.html" class="header-nav-btn" title="Profile">👤</a>
+            <a href="help.html" class="header-nav-btn" title="Help">❓</a>
         </nav>
     </header>
 
     <main class="dashboard-main">
         <h2 class="welcome-message" id="welcome-message" >Welcome, <span id="user-display-name">Friend</span>!</h2>
 
-        <!-- Empty state: shown when user has no pets or households -->
         <section id="empty-state" class="empty-state">
             <p class="empty-state-message" id="empty-state-message">Looks like you're just getting started. What would you like to do first?</p>
 
@@ -75,7 +75,7 @@
 
             <div class="activity-buttons">
                 <button class="activity-btn" data-type="FED" title="Fed">
-                    <img src="images/food-icon.png" alt="Fed" class="activity-icon">
+                    <img src="images/food-bowl.png" alt="Fed" class="activity-icon">
                 </button>
                 <button class="activity-btn" data-type="WALKED" title="Walked">
                     <img src="images/walking-icon.png" alt="Walked" class="activity-icon">
@@ -103,6 +103,6 @@
         </div>
     </div>
 
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>

@@ -28,11 +28,23 @@ public class UserService {
         return user;
     }
 
+    public void changeDisplayName(String newName, String email){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Error getting user"));
+
+        user.setDisplayName(newName);
+        userRepository.save(user);
+
+    }
+
     public Boolean login(String email, String password){
         return true;
     }
 
     public User getUserByID(Integer userId){
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+    }
+
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
     }
 }

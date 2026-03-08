@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.petstack.petstack.dto.response.HouseholdResponse;
 import com.petstack.petstack.model.Household;
 import com.petstack.petstack.service.HouseholdService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,23 +25,16 @@ public class HouseholdController {
     }
 
     @PostMapping
-    public HouseholdResponse createHousehold(@RequestBody CreateHouseholdRequest request) {
-        Household household = householdService.createHousehold(request.getUserId(), request.getHouseholdName(), request.getRole());
+    public HouseholdResponse createHousehold(@RequestBody CreateHouseholdRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        Household household = householdService.createHousehold(email, request.getHouseholdName(), request.getRole());
         return new HouseholdResponse(household);
     }
 
 
     public static class CreateHouseholdRequest{
-        private Integer userId;
         private String householdName;
         private String role;
-
-        public Integer getUserId(){
-            return userId;
-        }
-        public void setUserId(Integer userId){
-            this.userId = userId;
-        }
 
         public String getHouseholdName(){
             return householdName;

@@ -54,7 +54,6 @@ function showCreateHouseholdModal() {
         e.preventDefault();
 
         const data = Object.fromEntries(new FormData(form));
-        data.userId = localStorage.getItem('userId');
         data.role = "Creator";
 
         try {
@@ -63,7 +62,7 @@ function showCreateHouseholdModal() {
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall(`/api/users/${localStorage.getItem('userId')}`, {
+            const userStateRefresh = await apiCall('/api/users/me', {
                 method: 'GET'
             });
             localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
@@ -113,7 +112,6 @@ function showJoinHouseholdModal() {
         e.preventDefault();
 
         const data = Object.fromEntries(new FormData(form));
-        data.userId = localStorage.getItem('userId');
         data.role = "Member";
 
         try {
@@ -122,7 +120,7 @@ function showJoinHouseholdModal() {
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall(`/api/users/${localStorage.getItem('userId')}`, {
+            const userStateRefresh = await apiCall('/api/users/me', {
                 method: 'GET'
             });
             localStorage.setItem('households', JSON.stringify(userStateRefresh.households));

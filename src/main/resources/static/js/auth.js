@@ -1,6 +1,11 @@
 import { apiCall } from './utils.js';
 
-export function setupSignupForm() {
+document.addEventListener('DOMContentLoaded', function() {
+    setupSignupForm();
+    setupLoginForm();
+});
+
+function setupSignupForm() {
     const form = document.getElementById('signup-form');
     if (!form) return;
 
@@ -37,7 +42,7 @@ export function setupSignupForm() {
     });
 }
 
-export function setupLoginForm() {
+function setupLoginForm() {
     const form = document.getElementById('login-form');
     if (!form) return;
 
@@ -58,9 +63,10 @@ export function setupLoginForm() {
 
             console.log('Login successful:', response);
 
-            localStorage.setItem('userId', response.userId);
-            localStorage.setItem('displayName', response.displayName);
-            localStorage.setItem('households', JSON.stringify(response.households));
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('userId', response.user.userId);
+            localStorage.setItem('displayName', response.user.displayName);
+            localStorage.setItem('households', JSON.stringify(response.user.households));
 
             window.location.href = '/dashboard.html';
 

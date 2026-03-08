@@ -2,12 +2,12 @@ package com.petstack.petstack.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.petstack.petstack.dto.response.HouseholdMemberResponse;
@@ -31,27 +31,25 @@ public class HouseholdMemberController {
     //This is similar to the household controller but, obviously, cant be used in the instances where
     //a user joins because it would create an unintended household.
     @PostMapping
-    public HouseholdInfo registerHouseholdMember(@RequestBody RegisterHouseholdMemberRequest request) {
-        Household household = householdMemberService.registerHouseholdMember(request.getUserId(), request.getInviteCode(), request.getRole());
-        HouseholdMember householdMember = householdMemberService.getHouseholdMemberByUserIdAndHouseholdId(request.getUserId(), household.getHouseholdId());
+    public HouseholdInfo registerHouseholdMember(@RequestBody RegisterHouseholdMemberRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        Household household = householdMemberService.registerHouseholdMember(email, request.getInviteCode(), request.getRole());
+        HouseholdMember householdMember = householdMemberService.getHouseholdMemberByEmailAndHouseholdId(email, household.getHouseholdId());
         return new HouseholdInfo(household, householdMember);
     }
 
     @GetMapping("/{householdId}")
     public List<HouseholdMemberResponse> getHouseholdMembers(
             @PathVariable Integer householdId,
-            @RequestParam Integer currentUserId) {
-        return householdMemberService.getHouseholdMembersOrdered(currentUserId, householdId);
+            Authentication authentication) {
+        String email = authentication.getName();
+        return householdMemberService.getHouseholdMembersOrdered(email, householdId);
     }
     
 
     public static class RegisterHouseholdMemberRequest {
-        private Integer userId;
         private String inviteCode;
         private String role;
-
-        public Integer getUserId(){return userId;}
-        public void setUserId(Integer userId){this.userId = userId;}
 
         public String getInviteCode(){return inviteCode;}
         public void setInviteCode(String inviteCode){this.inviteCode = inviteCode;}

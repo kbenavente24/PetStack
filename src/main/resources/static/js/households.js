@@ -1,3 +1,5 @@
+import { apiCall } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Households Loaded!');
     setUpPage();
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pageContent.appendChild(grid);
         setUpCreateHouseholdButton();
         setUpJoinHouseholdButton();
+        document.querySelector('.dashboard-main').classList.add('ready');
     }
 
     function individualHouseholdBehavior(household){
@@ -90,10 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
     async function renderMembersList(container, household) {
         container.innerHTML = '';
 
-        const currentUserId = localStorage.getItem('userId');
-
         try {
-            const members = await apiCall(`/api/householdmember/${household.householdId}?currentUserId=${currentUserId}`);
+            const members = await apiCall(`/api/householdmember/${household.householdId}`);
 
             if (members.length === 0) {
                 container.innerHTML = '<li class="list-empty">No members yet</li>';
@@ -203,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const data = Object.fromEntries(new FormData(form));
-                data.userId = localStorage.getItem('userId');
                 data.role = "Creator";
             try {
                 const household = await apiCall('/api/household', {
@@ -250,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
 
             const data = Object.fromEntries(new FormData(form));
-            data.userId = localStorage.getItem('userId');
             data.role = "Member";
         try {
             const household = await apiCall('/api/householdmember', {
@@ -258,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall(`/api/users/${localStorage.getItem('userId')}`, {
+            const userStateRefresh = await apiCall('/api/users/me', {
                 method: 'GET'
             });
             localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
@@ -315,40 +314,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     }
 
-/**
- * Helper function to make API calls to your backend
- *
- * @param {string} endpoint - The API endpoint (e.g., '/api/pets')
- * @param {object} options - Fetch options (method, body, etc.)
- * @returns {Promise} - The JSON response from the server
- *
- * Usage examples:
- *   const pets = await apiCall('/api/pets');
- *   const newPet = await apiCall('/api/pets', { method: 'POST', body: JSON.stringify({...}) });
- */
-async function apiCall(endpoint, options = {}) {
-    // Set default headers for JSON
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
-
-    // Merge default options with provided options
-    const fetchOptions = { ...defaultOptions, ...options };
-
-    try {
-        const response = await fetch(endpoint, fetchOptions);
-
-        // Check if the request was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Parse and return JSON response
-        return await response.json();
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;
-    }
-}

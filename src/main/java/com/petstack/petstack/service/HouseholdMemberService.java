@@ -30,8 +30,13 @@ public class HouseholdMemberService {
         return householdMemberRepository.findByUserUserIdAndHouseholdHouseholdId(userId, householdId).orElseThrow(() -> new RuntimeException("Household member not found!"));
     }
 
-    public Household registerHouseholdMember(Integer userId, String inviteCode, String role){
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+    public HouseholdMember getHouseholdMemberByEmailAndHouseholdId(String email, Integer householdId){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
+        return householdMemberRepository.findByUserUserIdAndHouseholdHouseholdId(user.getUserId(), householdId).orElseThrow(() -> new RuntimeException("Household member not found!"));
+    }
+
+    public Household registerHouseholdMember(String email, String inviteCode, String role){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
 
         Household household = householdRepository.findByInviteCode(inviteCode).orElseThrow(() -> new RuntimeException("Household not found! Possible invalid invite code."));
 
@@ -43,15 +48,15 @@ public class HouseholdMemberService {
         
     }
 
-    public List<HouseholdMemberResponse> getHouseholdMembersOrdered(Integer currentUserId, Integer householdId) {
+    public List<HouseholdMemberResponse> getHouseholdMembersOrdered(String currentEmail, Integer householdId) {
         // 1. Fetch all members of the household
         List<HouseholdMember> members = householdMemberRepository.findByHouseholdHouseholdId(householdId);
 
         // 2. Sort: current user first, then alphabetically by displayName
         members.sort((a, b) -> {
             // Current user always comes first
-            if (a.getUser().getUserId().equals(currentUserId)) return -1;
-            if (b.getUser().getUserId().equals(currentUserId)) return 1;
+            if (a.getUser().getEmail().equals(currentEmail)) return -1;
+            if (b.getUser().getEmail().equals(currentEmail)) return 1;
             // Everyone else: alphabetical by displayName (case-insensitive)
             return a.getUser().getDisplayName().compareToIgnoreCase(b.getUser().getDisplayName());
         });
