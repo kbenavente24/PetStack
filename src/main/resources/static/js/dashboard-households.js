@@ -1,6 +1,6 @@
 import { apiCall } from './utils.js';
 import { showModal, hideModal, setModalContent } from './modals.js';
-import { loadPetsForHousehold } from './pets.js';
+import { loadPetsForHousehold, addPetCardFunctionality, populatePetDropdown, setupPetDropdownHandler } from './pets.js';
 
 export function populateHouseholdDropdown(households, selectedHouseholdId) {
     const householdDropdown = document.getElementById('household-dropdown');
@@ -24,7 +24,6 @@ export function setupHouseholdDropdownHandler() {
 
     householdDropdown.addEventListener('change', async (e) => {
         const householdId = e.target.value;
-        localStorage.setItem('lastHouseholdId', householdId);
         await loadPetsForHousehold(householdId);
     });
 }
@@ -57,7 +56,7 @@ function showCreateHouseholdModal() {
         data.role = "Creator";
 
         try {
-            await apiCall('/api/household', {
+            const household = await apiCall('/api/household', {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
@@ -68,16 +67,16 @@ function showCreateHouseholdModal() {
             localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
 
             hideModal();
-            showFirstTimeHouseholdCreation();
+            showFirstTimeHouseholdCreation(household);
         } catch (error) {
             console.error('Failed to create household:', error);
         }
     });
 }
 
-function showFirstTimeHouseholdCreation() {
+function showFirstTimeHouseholdCreation(household) {
     const topPageGreeting = document.getElementById('welcome-message');
-    topPageGreeting.textContent = JSON.parse(localStorage.getItem('households'))[0].householdName;
+    topPageGreeting.textContent = household.householdName;
 
     const firstHouseholdMessage = document.getElementById('empty-state-message');
     firstHouseholdMessage.textContent = "Now that you've created a household, it's time to add a pet. From there, you could either begin stacking or invite friends and family to your household!";
@@ -85,6 +84,12 @@ function showFirstTimeHouseholdCreation() {
     document.getElementById('btn-add-pet').classList.remove('hidden');
     document.getElementById('btn-create-household').classList.add('hidden');
     document.getElementById('btn-join-household').classList.add('hidden');
+
+    addPetCardFunctionality(household.householdId, async () => {
+        populateHouseholdDropdown([household], household.householdId);
+        setupHouseholdDropdownHandler();
+        await loadPetsForHousehold(household.householdId);
+    });
 }
 
 export function joinHouseholdCardFunctionality() {

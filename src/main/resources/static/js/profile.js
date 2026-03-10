@@ -32,8 +32,8 @@ function handleSignOut() {
     localStorage.removeItem('displayName');
     localStorage.removeItem('households');
 
-    // Redirect to login page
-    window.location.href = 'login.html';
+    // Redirect to landing page
+    window.location.href = 'index.html';
 }
 
 function openChangeNameModal() {

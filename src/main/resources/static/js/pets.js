@@ -12,23 +12,15 @@ export async function loadPetsForHousehold(householdId) {
         if (emptyState) emptyState.style.display = 'none';
         if (activeState) activeState.classList.remove('hidden');
 
-        localStorage.setItem('lastHouseholdId', householdId);
-
         if (pets.length > 0) {
-            const lastPetId = localStorage.getItem('lastPetId');
-            let selectedPet = pets.find(p => p.petId == lastPetId);
-            if (!selectedPet) {
-                selectedPet = pets[0];
-            }
 
-            populatePetDropdown(pets, selectedPet.petId);
+            populatePetDropdown(pets, pets[0].petId);
             setupPetDropdownHandler(householdId);
 
-            updatePetAvatar(selectedPet.petName);
+            updatePetAvatar(pets[0].petName);
 
-            localStorage.setItem('petId', selectedPet.petId);
-            localStorage.setItem('lastPetId', selectedPet.petId);
-            await loadActivitiesForPet(householdId, selectedPet.petId);
+            localStorage.setItem('petId', pets[0].petId);
+            await loadActivitiesForPet(householdId, pets[0].petId);
         } else {
             const petDropdown = document.getElementById('pet-dropdown');
             petDropdown.innerHTML = '<option>No pets yet</option>';
@@ -68,7 +60,6 @@ export function setupPetDropdownHandler(householdId) {
         const petName = e.target.options[e.target.selectedIndex].text;
 
         localStorage.setItem('petId', petId);
-        localStorage.setItem('lastPetId', petId);
 
         updatePetAvatar(petName);
         await loadActivitiesForPet(householdId, petId);
@@ -83,14 +74,14 @@ export function updatePetAvatar(petName) {
     }
 }
 
-export function addPetCardFunctionality(onPetAdded) {
+export function addPetCardFunctionality(householdId, onPetAdded) {
     const addPetButton = document.getElementById('btn-add-pet');
     addPetButton.addEventListener('click', () => {
-        showAddPetModal(onPetAdded);
+        showAddPetModal(householdId, onPetAdded);
     });
 }
 
-function showAddPetModal(onPetAdded) {
+function showAddPetModal(householdId, onPetAdded) {
     setModalContent(`
         <h2 class="text-center">Pet Information</h2>
         <p class="text-small mb-md">Before adding your pet, we'll need a bit of info!</p>
@@ -112,7 +103,7 @@ function showAddPetModal(onPetAdded) {
         e.preventDefault();
 
         const data = Object.fromEntries(new FormData(form));
-        data.householdId = JSON.parse(localStorage.getItem('households'))[0].householdId;
+        data.householdId = householdId;
 
         try {
             await apiCall('/api/pets', {

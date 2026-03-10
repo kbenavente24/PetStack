@@ -1,6 +1,7 @@
 package com.petstack.petstack.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.petstack.petstack.dto.response.HouseholdMemberResponse;
 import com.petstack.petstack.model.Household;
 import com.petstack.petstack.model.HouseholdMember;
+import com.petstack.petstack.model.HouseholdMemberId;
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.repository.HouseholdMemberRepository;
 import com.petstack.petstack.repository.HouseholdRepository;
@@ -47,6 +49,30 @@ public class HouseholdMemberService {
         return household;
         
     }
+
+    /*
+    
+    IMPLEMENT THIS IN CONTROLLER, AND FRONTNEND EVENTUALLY. THIS IS MEANT FOR WHEN A USER LEAVES A HOUSEHOLD, MEANING THEY ARE
+    NO LONGER A HOUSEHOLD MEMBER
+
+    */
+
+    public void removeHouseholdMember(String email, Integer householdId){
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
+        Household household = householdRepository.findById(householdId).orElseThrow(() -> 
+        new RuntimeException("Household not found!"));
+        
+        
+        HouseholdMemberId id = new HouseholdMemberId(user.getUserId(), household.getHouseholdId());
+        if (!householdMemberRepository.existsById(id)) {
+            throw new RuntimeException("User is not a member of this household");
+        }
+        householdMemberRepository.deleteById(id);
+
+    }
+    
+    
 
     public List<HouseholdMemberResponse> getHouseholdMembersOrdered(String currentEmail, Integer householdId) {
         // 1. Fetch all members of the household

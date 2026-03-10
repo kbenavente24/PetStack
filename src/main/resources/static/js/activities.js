@@ -61,17 +61,27 @@ export function showLogActivityConfirmation(activityType) {
         const date = getOrdinalSuffix(today.getDate());
         setModalContent(`
             <h2 class="text-center">Log Activity For Past Day</h2>
-            <p class="text-center mb-md">Select time that <strong>${petName}</strong> ${activityVerb} on ${today.toLocaleDateString('en-US', { weekday: 'long' })} 
+            <p class="text-center mb-md">Select time that <strong>${petName}</strong> ${activityVerb} on ${today.toLocaleDateString('en-US', { weekday: 'long' })}
             the ${date}</p>
-            <div class="edit-activity-options">
-                <button class="modal-btn" id="btn-confirm-log">Confirm</button>
-                <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
-            </div>
+            <form id="past-day-log-form">
+                <label>Time</label>
+                <input type="time" name="activityTime" required>
+                <div class="edit-activity-options">
+                    <button type="submit" class="modal-btn" id="btn-confirm-log">Confirm</button>
+                    <button type="button" class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
+                </div>
+            </form>
         `);
 
-        document.getElementById('btn-confirm-log').addEventListener('click', async () => {
+        document.getElementById('past-day-log-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedTime = document.querySelector('input[name="activityTime"]').value;
+            const [hours, minutes] = selectedTime.split(':');
+            const timestamp = new Date(today);
+            timestamp.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
             hideModal();
-            await logActivity(activityType);
+            await logActivity(activityType, timestamp.toISOString());
         });
 
         document.getElementById('btn-cancel-log').addEventListener('click', () => {
@@ -83,42 +93,24 @@ export function showLogActivityConfirmation(activityType) {
 
 }
 
-export async function logActivity(activityType) {
+export async function logActivity(activityType, customTimestamp) {
     const petId = localStorage.getItem('petId');
     const householdDropdown = document.getElementById('household-dropdown');
     const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
-    const activityTimestamp = new Date().toISOString();
-    let { start, end } = getDayRange(new Date());
-    console.log(start);
-    console.log(end);
 
-    /*
+    const isViewingPastDay = new Date().toISOString().split('T')[0] !== today.toISOString().split('T')[0];
+    const activityTimestamp = customTimestamp || new Date().toISOString();
+    const { start, end } = getDayRange(isViewingPastDay ? today : new Date());
 
-    check if we're viewing today's actual date or a previous day (meaning user went back some amount of time and pressed a log activity button)
-    */
-    const currMonthDayYear = new Date();
-    if(currMonthDayYear.toISOString().split('T')[0] !== today.toISOString().split('T')[0]){
-        ({start, end} = getDayRange(today));
-        console.log(start);
-        console.log(end);
-        await apiCall(`/api/activity`, {
-            method: 'POST',
-            body: JSON.stringify({
-                petId: petId,
-                activityType: activityType,
-                activityTimestamp: today.toISOString()
-            })
-        });
-    } else {
-        await apiCall(`/api/activity`, {
-            method: 'POST',
-            body: JSON.stringify({
-                petId: petId,
-                activityType: activityType,
-                activityTimestamp: activityTimestamp
-            })
-        });
-    }
+    await apiCall(`/api/activity`, {
+        method: 'POST',
+        body: JSON.stringify({
+            petId: petId,
+            activityType: activityType,
+            activityTimestamp: activityTimestamp
+        })
+    });
+
     const activities = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
     displayActivityLog(activities);
 }
@@ -301,17 +293,24 @@ function showEditActivityModal(activity) {
         });
 
         document.getElementById('btn-change-time').addEventListener('click', () => {
-            const formContainer = document.getElementById('edit-activity-form-container');
             const currentTime = new Date(activity.activityTimestamp);
             const timeValue = currentTime.toTimeString().slice(0, 5);
 
-            formContainer.innerHTML = `
-                <form id="change-time-form" class="mt-md">
+            setModalContent(`
+                <h2 class="text-center">Change Time</h2>
+                <form id="change-time-form">
                     <label>New Time</label>
                     <input type="time" name="newTime" value="${timeValue}" required>
-                    <button type="submit" class="modal-btn">Update Time</button>
+                    <div class="edit-activity-options">
+                        <button type="submit" class="modal-btn">Update Time</button>
+                        <button type="button" class="modal-btn btn-secondary" id="btn-back">Back</button>
+                    </div>
                 </form>
-            `;
+            `);
+
+            document.getElementById('btn-back').addEventListener('click', () => {
+                showEditOptions();
+            });
 
             document.getElementById('change-time-form').addEventListener('submit', async (e) => {
                 e.preventDefault();

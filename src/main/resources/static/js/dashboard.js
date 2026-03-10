@@ -1,5 +1,6 @@
+import { apiCall } from './utils.js';
 import { setupActivityButtons, setupDateDisplay } from './activities.js';
-import { loadPetsForHousehold, addPetCardFunctionality } from './pets.js';
+import { loadPetsForHousehold } from './pets.js';
 import {
     populateHouseholdDropdown,
     setupHouseholdDropdownHandler,
@@ -17,14 +18,6 @@ async function setupDashboard() {
     joinHouseholdCardFunctionality();
     setupDateDisplay();
 
-    addPetCardFunctionality(async () => {
-        const userHouseholds = JSON.parse(localStorage.getItem('households')) || [];
-        const householdId = userHouseholds[0].householdId;
-        populateHouseholdDropdown(userHouseholds, householdId);
-        setupHouseholdDropdownHandler();
-        await loadPetsForHousehold(householdId);
-    });
-
     const token = localStorage.getItem('token');
     const displayName = localStorage.getItem('displayName');
 
@@ -35,21 +28,28 @@ async function setupDashboard() {
 
     document.getElementById('user-display-name').textContent = displayName;
 
-    const userHouseholds = JSON.parse(localStorage.getItem('households')) || [];
-    if (userHouseholds.length === 0) {
+
+    try {
+        const getUserForHouseholds = await apiCall('/api/users/me', {
+            method: 'GET'
+        });
+
+        console.log(getUserForHouseholds.households[0]);
+        console.log(getUserForHouseholds.households.length);
+
+        if(getUserForHouseholds.households.length === 0){
+            document.querySelector('.dashboard-main').classList.add('ready');
+            return;        
+        }
+    
+        populateHouseholdDropdown(getUserForHouseholds.households, getUserForHouseholds.households[0].householdId);
+        setupHouseholdDropdownHandler();
+
+        await loadPetsForHousehold(getUserForHouseholds.households[0].householdId);
         document.querySelector('.dashboard-main').classList.add('ready');
-        return;
+
+    } catch (error){
+        alert('Failed to get user information');    
     }
 
-    const lastHouseholdId = localStorage.getItem('lastHouseholdId');
-    let selectedHousehold = userHouseholds.find(h => h.householdId == lastHouseholdId);
-    if (!selectedHousehold) {
-        selectedHousehold = userHouseholds[0];
-    }
-
-    populateHouseholdDropdown(userHouseholds, selectedHousehold.householdId);
-    setupHouseholdDropdownHandler();
-
-    await loadPetsForHousehold(selectedHousehold.householdId);
-    document.querySelector('.dashboard-main').classList.add('ready');
 }

@@ -67,6 +67,7 @@ function setupLoginForm() {
             localStorage.setItem('userId', response.user.userId);
             localStorage.setItem('displayName', response.user.displayName);
             localStorage.setItem('households', JSON.stringify(response.user.households));
+            console.log(JSON.stringify(response.user.households));
 
             window.location.href = '/dashboard.html';
 
