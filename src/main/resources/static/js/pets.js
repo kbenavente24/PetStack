@@ -19,7 +19,6 @@ export async function loadPetsForHousehold(householdId) {
 
             updatePetAvatar(pets[0].petName);
 
-            localStorage.setItem('petId', pets[0].petId);
             await loadActivitiesForPet(householdId, pets[0].petId);
         } else {
             const petDropdown = document.getElementById('pet-dropdown');
@@ -59,8 +58,6 @@ export function setupPetDropdownHandler(householdId) {
         const petId = e.target.value;
         const petName = e.target.options[e.target.selectedIndex].text;
 
-        localStorage.setItem('petId', petId);
-
         updatePetAvatar(petName);
         await loadActivitiesForPet(householdId, petId);
 
@@ -88,10 +85,16 @@ function showAddPetModal(householdId, onPetAdded) {
         <form id="add-pet-form">
             <label>Your Pet's Name</label>
             <input type="text" name="petName" required>
-            <label>Your Pet's Breed</label>
-            <input type="text" name="petSpecies" required>
-            <label>Your Pet's Date of Birth (Optional)</label>
-            <input type="text" name="petBirthdate" required>
+            <label>Type of Pet</label>
+            <select name="petSpecies" required>
+                <option value="" disabled selected>Select one</option>
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Bird">Bird</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Fish">Fish</option>
+                <option value="Reptile">Reptile</option>
+            </select>
             <button type="submit" class="modal-btn">Confirm</button>
         </form>
     `);

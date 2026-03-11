@@ -6,29 +6,42 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-    function setUpPage(){
-        const households = JSON.parse(localStorage.getItem('households'));
-        const grid = document.createElement('div');
-        grid.className = 'households-grid';
-        grid.id = 'households-grid';
-        const pageContent = document.getElementById('households-content');
+    async function setUpPage(){
 
-        households.forEach(household => {
-            const circle = document.createElement('div');
-            circle.className = 'household-circle';
-            circle.textContent = household.householdName;
+        try{
 
-            circle.addEventListener('click',(e) => {
-                document.getElementById('household-page-btns').classList.add("hidden");
-                individualHouseholdBehavior(household);
+            const response = await apiCall('/api/users/me', {
+                method: 'GET'
             })
-            grid.appendChild(circle);
-        });
 
-        pageContent.appendChild(grid);
-        setUpCreateHouseholdButton();
-        setUpJoinHouseholdButton();
-        document.querySelector('.dashboard-main').classList.add('ready');
+            console.log('get method worked');
+
+            const households = response.households;
+            const grid = document.createElement('div');
+            grid.className = 'households-grid';
+            grid.id = 'households-grid';
+            const pageContent = document.getElementById('households-content');
+
+            households.forEach(household => {
+                const circle = document.createElement('div');
+                circle.className = 'household-circle';
+                circle.textContent = household.householdName;
+
+                circle.addEventListener('click',(e) => {
+                    document.getElementById('household-page-btns').classList.add("hidden");
+                    individualHouseholdBehavior(household);
+                })
+                grid.appendChild(circle);
+            });
+
+            pageContent.appendChild(grid);
+            setUpCreateHouseholdButton();
+            setUpJoinHouseholdButton();
+            document.querySelector('.dashboard-main').classList.add('ready');
+        } catch (error){
+            alert('Failed to get households! Please contact site developer.');
+        }
+        
     }
 
     function individualHouseholdBehavior(household){
@@ -211,10 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify(data)
                 });
 
-            const existingHouseholds = JSON.parse(localStorage.getItem('households'));
-            existingHouseholds.push(household);
-            localStorage.setItem('households', JSON.stringify(existingHouseholds));
-            console.log(JSON.parse(localStorage.getItem('households')));
             //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
             document.getElementById('modal-overlay').classList.add('hidden');
             const grid = document.getElementById('households-grid');
@@ -257,17 +266,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall('/api/users/me', {
-                method: 'GET'
-            });
-            localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
-            console.log(JSON.parse(localStorage.getItem('households')));
             //HOUSEHOLD CREATED SUCCESSFULLY--CLOSE THE MODAL
             document.getElementById('modal-overlay').classList.add('hidden');
             const grid = document.getElementById('households-grid');
             const circle = document.createElement('div');
             circle.className = 'household-circle';
             circle.textContent = household.householdName;
+            circle.addEventListener('click',(e) => {
+                document.getElementById('household-page-btns').classList.add("hidden");
+                individualHouseholdBehavior(household);
+            })
             grid.appendChild(circle);        
             } catch (error) {
                 console.error('Failed to :', error);
@@ -281,10 +289,18 @@ document.addEventListener('DOMContentLoaded', function() {
             <h2 class="text-center">Add a Pet</h2>
             <p class="text-small mb-md">Add a new pet to ${household.householdName}.</p>
             <form id="add-pet-form">
-                <label>Pet Name</label>
+                <label>Your Pet's Name</label>
                 <input type="text" name="petName" required>
-                <label>Species</label>
-                <input type="text" name="petSpecies" placeholder="e.g., Dog, Cat, Bird">
+                <label>Type of Pet</label>
+                <select name="petSpecies" required>
+                    <option value="" disabled selected>Select one</option>
+                    <option value="Dog">Dog</option>
+                    <option value="Cat">Cat</option>
+                    <option value="Bird">Bird</option>
+                    <option value="Rabbit">Rabbit</option>
+                    <option value="Fish">Fish</option>
+                    <option value="Reptile">Reptile</option>
+                </select>
                 <button type="submit" class="modal-btn">Add Pet</button>
             </form>
             `;

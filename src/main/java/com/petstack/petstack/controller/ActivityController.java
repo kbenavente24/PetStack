@@ -31,7 +31,7 @@ public class ActivityController {
             request.getActivityType(),
             request.getActivityTimestamp()
         );
-        return new ActivityResponse(activity);
+        return new ActivityResponse(activity, email);
     }
 
     @GetMapping("/pet")
@@ -39,7 +39,7 @@ public class ActivityController {
         String email = authentication.getName();
         List<Activity> activities = activityService.getActivitiesForSpecificDate(start, end, householdId, email, petId);
 
-        return activities.stream().map(activity -> new ActivityResponse(activity)).toList();
+        return activities.stream().map(activity -> new ActivityResponse(activity, email)).toList();
     }
 
     @DeleteMapping("/{activityId}")
@@ -52,14 +52,14 @@ public class ActivityController {
     public ActivityResponse updateActivityTime(@PathVariable Integer activityId, @RequestBody UpdateTimeRequest request, Authentication authentication) {
         String email = authentication.getName();
         Activity activity = activityService.updateActivityTime(activityId, email, request.getNewTimestamp());
-        return new ActivityResponse(activity);
+        return new ActivityResponse(activity, email);
     }
 
     @PutMapping("/{activityId}/type")
     public ActivityResponse updateActivityType(@PathVariable Integer activityId, @RequestBody UpdateTypeRequest request, Authentication authentication) {
         String email = authentication.getName();
         Activity activity = activityService.updateActivityType(activityId, email, request.getNewType());
-        return new ActivityResponse(activity);
+        return new ActivityResponse(activity, email);
     }
 
     // Inner class to represent the incoming JSON request

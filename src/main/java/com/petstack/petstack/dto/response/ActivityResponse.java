@@ -9,18 +9,18 @@ public class ActivityResponse {
     private String activityType;
     private String petName;
     private String loggedByName;
-    private Integer loggedByUserId;
     private Instant activityTimestamp;
     private String activityNotes;
+    private boolean loggedByCurrentUser;
 
-    public ActivityResponse(Activity activity) {
+    public ActivityResponse(Activity activity, String currentEmail) {
         this.activityId = activity.getActivityId();
         this.petName = activity.getPet().getPetName();
         this.activityType = activity.getActivityType().name();
         this.loggedByName = activity.getUser().getDisplayName();
-        this.loggedByUserId = activity.getUser().getUserId();
         this.activityTimestamp = activity.getActivityTimestamp();
         this.activityNotes = activity.getActivityNotes();
+        this.loggedByCurrentUser = activity.getUser().getEmail().equals(currentEmail);
     }
 
     // Getters
@@ -28,7 +28,7 @@ public class ActivityResponse {
     public String getPetName() { return petName; }
     public String getActivityType() { return activityType; }
     public String getLoggedByName() { return loggedByName; }
-    public Integer getLoggedByUserId() { return loggedByUserId; }
     public Instant getActivityTimestamp() { return activityTimestamp; }
     public String getActivityNotes() { return activityNotes; }
+    public boolean getLoggedByCurrentUser() { return loggedByCurrentUser; }
 }

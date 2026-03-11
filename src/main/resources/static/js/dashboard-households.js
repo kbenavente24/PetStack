@@ -61,11 +61,6 @@ function showCreateHouseholdModal() {
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall('/api/users/me', {
-                method: 'GET'
-            });
-            localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
-
             hideModal();
             showFirstTimeHouseholdCreation(household);
         } catch (error) {
@@ -120,19 +115,40 @@ function showJoinHouseholdModal() {
         data.role = "Member";
 
         try {
-            await apiCall('/api/householdmember', {
+            const household = await apiCall('/api/householdmember', {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
 
-            const userStateRefresh = await apiCall('/api/users/me', {
-                method: 'GET'
-            });
-            localStorage.setItem('households', JSON.stringify(userStateRefresh.households));
-
-            hideModal();
+            showJoinHouseholdSuccess(household);
         } catch (error) {
             console.error('Failed to join household:', error);
         }
+    });
+}
+
+function showJoinHouseholdSuccess(household) {
+    setModalContent(`
+        <h2 class="text-center">You successfully joined ${household.householdName}!</h2>
+        <div class="edit-activity-options">
+            <button class="modal-btn" id="btn-view-activity-log">View pet activity log</button>
+            <button class="modal-btn btn-secondary" id="btn-go-to-households">Join or create another household</button>
+        </div>
+    `);
+
+    document.getElementById('btn-view-activity-log').addEventListener('click', async () => {
+        hideModal();
+
+        const userStateRefresh = await apiCall('/api/users/me');
+        populateHouseholdDropdown(userStateRefresh.households, household.householdId);
+        setupHouseholdDropdownHandler();
+        await loadPetsForHousehold(household.householdId);
+
+        document.getElementById('empty-state')?.remove();
+        document.getElementById('active-state')?.classList.remove('hidden');
+    });
+
+    document.getElementById('btn-go-to-households').addEventListener('click', () => {
+        window.location.href = 'households.html';
     });
 }

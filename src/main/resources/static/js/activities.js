@@ -94,9 +94,8 @@ export function showLogActivityConfirmation(activityType) {
 }
 
 export async function logActivity(activityType, customTimestamp) {
-    const petId = localStorage.getItem('petId');
-    const householdDropdown = document.getElementById('household-dropdown');
-    const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+    const petId = document.getElementById('pet-dropdown').value;
+    const householdId = document.getElementById('household-dropdown').value;
 
     const isViewingPastDay = new Date().toISOString().split('T')[0] !== today.toISOString().split('T')[0];
     const activityTimestamp = customTimestamp || new Date().toISOString();
@@ -123,35 +122,35 @@ export function displayActivityLog(activities) {
         const log = document.createElement('li');
         log.className = 'activity-entry';
 
-        if (activity.loggedByUserId === parseInt(localStorage.getItem('userId'), 10)) {
-            const editBtn = document.createElement('button');
-            editBtn.className = 'activity-edit-btn';
-            editBtn.textContent = '📝';
-            editBtn.addEventListener('click', () => {
-                showEditActivityModal(activity);
-            });
-            log.appendChild(editBtn);
-        }
+        if (activity.loggedByCurrentUser) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'activity-edit-btn';
+                editBtn.textContent = '📝';
+                editBtn.addEventListener('click', () => {
+                    showEditActivityModal(activity);
+                });
+                log.appendChild(editBtn);
+            }
 
-        const icon = getActivityIcon(activity.activityType);
-        const text = document.createElement('span');
+            const icon = getActivityIcon(activity.activityType);
+            const text = document.createElement('span');
 
-        if (activity.activityType == "FED") {
-            text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
-        }
-        if (activity.activityType == "WALKED") {
-            text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
-        }
-        if (activity.activityType == "POOP") {
-            text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
-        }
-        if (activity.activityType == "PEE") {
-            text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
-        }
+            if (activity.activityType == "FED") {
+                text.textContent = `${activity.petName} was fed by ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
+            }
+            if (activity.activityType == "WALKED") {
+                text.textContent = `${activity.petName} walked with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
+            }
+            if (activity.activityType == "POOP") {
+                text.textContent = `${activity.petName} pooped with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
+            }
+            if (activity.activityType == "PEE") {
+                text.textContent = `${activity.petName} peed with ${activity.loggedByName} @ ${formatTime12Hour(activity.activityTimestamp)}`;
+            }
 
-        log.appendChild(icon);
-        log.appendChild(text);
-        activityLog.prepend(log);
+            log.appendChild(icon);
+            log.appendChild(text);
+            activityLog.prepend(log);
     }
 }
 
@@ -183,9 +182,8 @@ export async function loadActivitiesForPet(householdId, petId) {
 }
 
 export async function refreshActivityLog() {
-    const householdDropdown = document.getElementById('household-dropdown');
-    const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
-    const petId = localStorage.getItem('petId');
+    const householdId = document.getElementById('household-dropdown').value;
+    const petId = document.getElementById('pet-dropdown').value;
 
     const dateSpan = document.getElementById('activity-date');
     const displayedDate = new Date(dateSpan.textContent);
@@ -213,10 +211,10 @@ export function setupDateDisplay() {
     previousDayButton.addEventListener('click', async () => {
         today.setDate(today.getDate() - 1);
         const { start, end } = getDayRange(today);
-        const householdDropdown = document.getElementById('household-dropdown');
-        const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+        const householdId = document.getElementById('household-dropdown').value;
+        const petId = document.getElementById('pet-dropdown').value;
 
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${localStorage.getItem('petId')}`);
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
 
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
@@ -232,10 +230,10 @@ export function setupDateDisplay() {
         }
         today.setDate(today.getDate() + 1);
         const { start, end } = getDayRange(today);
-        const householdDropdown = document.getElementById('household-dropdown');
-        const householdId = householdDropdown ? householdDropdown.value : localStorage.getItem('lastHouseholdId');
+        const householdId = document.getElementById('household-dropdown').value;
+        const petId = document.getElementById('pet-dropdown').value;
 
-        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${localStorage.getItem('petId')}`);
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
         dateSpan.textContent = today.toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',

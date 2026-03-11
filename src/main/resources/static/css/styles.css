@@ -499,6 +499,10 @@ a:hover {
     opacity: 1;
 }
 
+.dashboard-logo-link {
+    text-decoration: none;
+}
+
 .dashboard-logo {
     font-size: var(--font-size-xl);
     font-weight: 700;
