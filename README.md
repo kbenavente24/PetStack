@@ -1,4 +1,24 @@
-# PetStack
-[Visit PetStack](https://petstack.app/)
-## Overview:
-PetStack is a web application that allows people who share responsibility for a pet to collaboratively keep track of their pet’s care by logging activities in a shared, real-time daily journal. The idea came from a personal problem I wanted to solve. Living in a household of five with one dog, we often lose track of who did what. Almost daily, the same questions would be asked in my family's groupchat: "Did someone feed Nala this morning?", "Did someone take Nala out before bed?" PetStack was built to solve that problem by providing a simple, practical daily log that a group of people can quickly use to see what’s been done and what hasn’t, with no learning curve. 
+# [petstack.app](https://petstack.app/)
+
+## :dog: Overview:
+PetStack is a mobile-focused web application that helps families, roommates, or even pet-sitters in keeping track of their pet’s daily care through a shared, real-time activity log. The idea came from a personal problem I wanted to solve. Living in a household of five with one dog, we often lose track of who did what. Almost daily, the same questions would be asked in my family's groupchat: "Did someone feed Nala this morning?", "Did someone take Nala out before bed?" PetStack was built to solve that problem by providing a simple, practical daily log that a group of people can quickly use to see what’s been done and what hasn’t, with no learning curve.
+
+My development of this app wasn't an attempt to reinvent the wheel — this definitely isn't a novel idea. But when I looked for existing apps that could solve my family's problem, I kept running into the same issues: busy layouts, unnecessary features, and apps trying to do too much. My design philosophy with PetStack was to create something that someone could pick up and immediately understand what it offers the moment they sign in — straightforward, easy on the eyes, and practical enough that my family has used it as a daily tool.
+
+Another reason for developing this app was to dive deeper into Spring/Spring Boot and build a larger-scale Java project. As an aspiring backend software engineer whose main language of choice is Java, I wanted to build something that implements tools, techniques, and design patterns commonly used in professional and enterprise environments. Over the 3 months I've spent developing this application (and continuing to work on it), I've learned a ton that I'm confident will carry over into the problems I solve in the future.
+
+## :cat: Tech Stack
+- **Backend:** Java 21, Spring Boot 4.0.1 (Spring MVC, Spring Security, Spring Data JPA)
+- **Frontend:** HTML5, CSS3, vanilla JavaScript (ES6 modules)
+- **Database:** PostgreSQL, Supabase 
+- **Authentication:** JWT (JSON Web Tokens) with BCrypt password hashing
+- **Deployment:** Docker, Render
+
+## :hamster: Features
+- **Activity Logging** — Log feedings, walks, pees, and poops with a single tap. Each entry is timestamped and attributed to the user who logged it, so everyone can see what's been done and by whom.
+- **Households** — Create a household and invite family members or roommates with a unique invite code. Everyone in the household shares the same view of the pet's daily log.
+- **Multi-Pet Support** — Add multiple pets to a household and track activities for each one individually.
+- **Daily Log View** — Browse activity history by date with simple day-by-day navigation, making it easy to look back and see patterns.
+- **Activity Editing** — Edit timestamps or activity types after logging, and delete entries you created if something was logged by mistake.
+- **User Profiles** — Each member has their own account with a display name, so entries in the log are always attributed to the right person.
+- **Mobile-First Design** — Built as a Progressive Web App, PetStack can be added to your phone's home screen and opens in standalone mode — no browser bar, just the app.
