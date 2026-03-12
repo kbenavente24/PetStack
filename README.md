@@ -1,1 +1,3 @@
-# PetShare
+# PetStack
+## Overview:
+PetStack is a web application that allows people who share responsibility for a pet to collaboratively keep track of their pet’s care by logging activities in a shared, real-time daily journal. The idea came from a personal problem I wanted to solve. Living in a household of five with one dog, we often lose track of who did what. Almost daily, the same questions would be asked in my family's groupchat: "Did someone feed Nala this morning?", "Did someone take Nala out before bed?" PetStack was built to solve that problem by providing a simple, practical daily log that a group of people can quickly use to see what’s been done and what hasn’t, with no learning curve. 
