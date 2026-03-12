@@ -71,10 +71,10 @@ export function getOrdinalSuffix(date) {
 
 export function getActivityIcon(activityType) {
     const iconMap = {
-        'FED': { type: 'image', value: 'images/food-bowl.png' },
-        'WALKED': { type: 'image', value: 'images/walking-icon.png' },
-        'PEE': { type: 'image', value: 'images/pee.png' },
-        'POOP': { type: 'image', value: 'images/poop.png' }
+        'FED': { type: 'image', value: 'images/food-icon.png' },
+        'WALKED': { type: 'image', value: 'images/walk-icon.png' },
+        'PEE': { type: 'image', value: 'images/pee-icon.png' },
+        'POOP': { type: 'image', value: 'images/poop-icon.png' }
     };
 
     const iconData = iconMap[activityType] || { type: 'emoji', value: '❓' };

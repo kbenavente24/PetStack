@@ -153,6 +153,14 @@ a:hover {
     font-size: 2rem;
     font-weight: 700;
     color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.landing-wordmark-icon {
+    height: 2rem;
+    width: auto;
 }
 
 .landing-headline {
@@ -501,6 +509,14 @@ a:hover {
 
 .dashboard-logo-link {
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.dashboard-logo-icon {
+    height: 1.6rem;
+    width: auto;
 }
 
 .dashboard-logo {
