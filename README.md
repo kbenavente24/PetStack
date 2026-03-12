@@ -1,7 +1,7 @@
 # [petstack.app](https://petstack.app/)
 
 ## :dog: Overview:
-PetStack is a mobile-focused web application that helps families, roommates, or even pet-sitters in keeping track of their pet’s daily care through a shared, real-time activity log. The idea came from a personal problem I wanted to solve. Living in a household of five with one dog, my family often loses track of who did what. Almost daily, the same questions would be asked in our groupchat: "Did someone feed Nala this morning?", "Did someone take Nala out before bed?" PetStack was built to solve that problem by providing a simple, practical daily log that a group of people can quickly use to see what’s been done and what hasn’t, with no learning curve.
+PetStack is a mobile-focused web application that helps families, roommates, or even pet sitters keep track of their pet’s daily care through a shared, real-time activity log. The idea came from a personal problem I wanted to solve. Living in a household of five with one dog, my family often loses track of who did what. Almost daily, the same questions would be asked in our groupchat: "Did someone feed Nala this morning?", "Did someone take Nala out before bed?" PetStack was built to solve that problem by providing a simple, practical daily log that a group of people can quickly use to see what’s been done and what hasn’t, with no learning curve.
 
 My development of this app wasn't an attempt to reinvent the wheel — this definitely isn't a novel idea. But when I looked for existing apps that could solve my family's problem, I kept running into the same issues: busy layouts, unnecessary features, and apps trying to do too much. My design philosophy with PetStack was to create something that someone could pick up and immediately understand what it offers the moment they sign in — straightforward, easy on the eyes, and practical enough that my family has used it as a daily tool.
 
@@ -14,13 +14,18 @@ Another reason for developing this app was to dive deeper into Spring/Spring Boo
 - **Authentication:** JWT (JSON Web Tokens) with BCrypt password hashing
 - **Deployment:** Docker, Render
 
-## :hamster: Features
+## :hamster: Current Features
 - **Activity Logging** — Log feedings, walks, pees, and poops with a single tap. Each entry is timestamped and attributed to the user who logged it, so everyone can see what's been done and by whom.
 - **Households** — Create a household and invite family members or roommates with a unique invite code. Everyone in the household shares the same view of the pet's daily log.
 - **Multi-Pet Support** — Add multiple pets to a household and track activities for each one individually.
 - **Daily Log View** — Browse activity history by date with simple day-by-day navigation, making it easy to look back and see patterns.
 - **Activity Editing** — Edit timestamps or activity types after logging, and delete entries you created if something was logged by mistake.
 - **User Profiles** — Each member has their own account with a display name, so entries in the log are always attributed to the right person.
+
+## :parrot: Planned Features In Development
+- **Household Statistics** — View weekly, monthly, and yearly stats such as which household member took their pet(s) out for the most walks.
+- **Activity Notes** — Attach a note to a logged activity in case important information needs to be shared with the household (i.e. "Running out of poopy bags", "Need to buy more kibble")
+- **Deeper Profile Customization** — Users can upload a profile photo for their pet, choose species, breed, description, etc.
 
 ## :rabbit: Architecture
 
@@ -57,5 +62,3 @@ The schema consists of five tables with relationships designed to avoid redundan
 - **HouseholdMember** — a join table connecting users and households using a **composite primary key** (`userId` + `householdId`). This enforces that a user can only be a member of a given household once, while also storing per-membership data like their role and the date they joined.
 - **Pet** — belongs to exactly one household. Deleting a pet cascades to all its activity records.
 - **Activity** — records a single event (fed, walked, pee, poop) for a pet, logged by a specific user at a specific time.
-
-The use of a composite key on `HouseholdMember` instead of a surrogate ID is a deliberate normalization decision — it naturally prevents duplicate memberships at the database level without needing extra unique constraints, and it keeps the join table in BCNF by ensuring every determinant is a candidate key
