@@ -27,6 +27,13 @@ export function showLogActivityConfirmation(activityType) {
         'POOP': 'pooped'
     };
     const activityVerb = activityVerbs[activityType] || activityType.toLowerCase();
+    const activityIcons = {
+        'FED': 'images/food-icon.png',
+        'WALKED': 'images/walk-icon.png',
+        'PEE': 'images/pee-icon.png',
+        'POOP': 'images/poop-icon.png'
+    };
+    const iconSrc = activityIcons[activityType];
 
     if(currDate.toISOString().split('T')[0] == today.toISOString().split('T')[0]) {
         const currDate = new Date();
@@ -38,6 +45,7 @@ export function showLogActivityConfirmation(activityType) {
 
         setModalContent(`
             <h2 class="text-center">Log Activity</h2>
+            <div class="text-center mb-md"><img src="${iconSrc}" alt="${activityType}" class="modal-activity-icon"></div>
             <p class="text-center mb-md">Log that <strong>${petName}</strong> ${activityVerb} @ ${timeString}?</p>
             <div class="edit-activity-options">
                 <button class="modal-btn" id="btn-confirm-log">Confirm</button>
@@ -61,6 +69,7 @@ export function showLogActivityConfirmation(activityType) {
         const date = getOrdinalSuffix(today.getDate());
         setModalContent(`
             <h2 class="text-center">Log Activity For Past Day</h2>
+            <div class="text-center mb-md"><img src="${iconSrc}" alt="${activityType}" class="modal-activity-icon"></div>
             <p class="text-center mb-md">Select time that <strong>${petName}</strong> ${activityVerb} on ${today.toLocaleDateString('en-US', { weekday: 'long' })}
             the ${date}</p>
             <form id="past-day-log-form">
@@ -125,7 +134,11 @@ export function displayActivityLog(activities) {
         if (activity.loggedByCurrentUser) {
                 const editBtn = document.createElement('button');
                 editBtn.className = 'activity-edit-btn';
-                editBtn.textContent = '📝';
+                const editImg = document.createElement('img');
+                editImg.src = 'images/pencil.png';
+                editImg.alt = 'Edit';
+                editImg.className = 'edit-icon-img';
+                editBtn.appendChild(editImg);
                 editBtn.addEventListener('click', () => {
                     showEditActivityModal(activity);
                 });
@@ -335,6 +348,7 @@ function showEditActivityModal(activity) {
         });
 
         document.getElementById('btn-change-type').addEventListener('click', () => {
+            document.querySelector('.edit-activity-options').style.display = 'none';
             const formContainer = document.getElementById('edit-activity-form-container');
             formContainer.innerHTML = `
                 <form id="change-type-form" class="mt-md">

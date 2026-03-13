@@ -20,9 +20,9 @@
     <header class="dashboard-header">
         <a href="dashboard.html" class="dashboard-logo-link"><img src="images/logo.png" alt="PetStack Logo" class="dashboard-logo-icon"><h1 class="dashboard-logo">PetStack</h1></a>
         <nav class="header-nav">
-            <a href="dashboard.html" class="header-nav-btn active" title="Dashboard">📋</a>
-            <a href="households.html" class="header-nav-btn" title="Households">🏠</a>
-            <a href="profile.html" class="header-nav-btn" title="Profile">👤</a>
+            <a href="dashboard.html" class="header-nav-btn active" title="Dashboard"><img src="images/dashboard-header-icon.png" alt="Dashboard" class="nav-icon"></a>
+            <a href="households.html" class="header-nav-btn" title="Households"><img src="images/households-header-icon.png" alt="Households" class="nav-icon"></a>
+            <a href="profile.html" class="header-nav-btn" title="Profile"><img src="images/user-header-icon.png" alt="Profile" class="nav-icon"></a>
         </nav>
     </header>
 
@@ -34,19 +34,19 @@
 
             <div class="action-cards">
                 <button class="action-card hidden" id="btn-add-pet">
-                    <span class="action-icon">🐾</span>
+                    <span class="action-icon"><img src="images/pets-dashboard-icon.png" alt="Add Pet" class="action-icon-img"></span>
                     <span class="action-title">Add Your Pet</span>
-                    <span class="action-desc">Start tracking activities for your furry friend</span>
+                    <span class="action-desc">You're almost finished! After adding your first pet you can begin logging activities.</span>
                 </button>
 
                 <button class="action-card" id="btn-create-household">
-                    <span class="action-icon">🏠</span>
+                    <span class="action-icon"><img src="images/add-household-icon.png" alt="Create Household" class="action-icon-img" style="margin-left: 3px;"></span>
                     <span class="action-title">Create a Household</span>
                     <span class="action-desc">Set up a space to share pet care with others</span>
                 </button>
 
                 <button class="action-card" id="btn-join-household">
-                    <span class="action-icon">🤝</span>
+                    <span class="action-icon"><img src="images/join-household-icon.png" alt="Join Household" class="action-icon-img" style="margin-right: 7px;"></span>
                     <span class="action-title">Join a Household</span>
                     <span class="action-desc">Enter an invite code to join an existing group</span>
                 </button>
@@ -61,11 +61,11 @@
             </div>
 
             <div class="dropdown-row">
-                <span class="dropdown-icon">🏠</span>
+                <span class="dropdown-icon"><img src="images/household-dashboard-icon.png" alt="Household" class="dropdown-icon-img"></span>
                 <select class="household-dropdown" id="household-dropdown"></select>
             </div>
             <div class="dropdown-row">
-                <span class="dropdown-icon">🐾</span>
+                <span class="dropdown-icon"><img src="images/pets-dashboard-icon.png" alt="Pet" class="dropdown-icon-img"></span>
                 <select class="pet-dropdown" id="pet-dropdown"></select>
             </div>
 

@@ -342,6 +342,8 @@ a:hover {
 }
 
 .btn-secondary {
+    -webkit-appearance: none;
+    appearance: none;
     background-color: var(--color-surface);
     color: var(--color-primary);
     border: 2px solid var(--color-primary);
@@ -471,7 +473,7 @@ a:hover {
 /* Header Navigation */
 .header-nav {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
 }
 
 .header-nav-btn {
@@ -493,7 +495,7 @@ a:hover {
 }
 
 .header-nav-btn.active {
-    background-color: var(--color-primary);
+    background-color: #e8e8e8;
     filter: grayscale(0);
 }
 
@@ -505,6 +507,24 @@ a:hover {
 .header-nav-btn:not(.active):hover {
     filter: grayscale(0);
     opacity: 1;
+}
+
+.nav-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.action-icon-img {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+}
+
+.dropdown-icon-img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
 }
 
 .dashboard-logo-link {
@@ -622,7 +642,30 @@ a:hover {
   min-height: 44px;
 }
 
+.modal-content select {
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background);
+  min-height: 44px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.modal-activity-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+}
+
 .modal-content button {
+  -webkit-appearance: none;
+  appearance: none;
   margin-top: 1rem;
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--color-primary);
@@ -680,8 +723,12 @@ a:hover {
 
 .dropdown-icon {
     position: absolute;
-    left: calc(50% - 140px);
+    left: calc(50% - 142px);
+    top: 50%;
+    transform: translateY(-50%);
     font-size: var(--font-size-xl);
+    display: flex;
+    align-items: center;
 }
 
 .household-dropdown {
@@ -691,7 +738,11 @@ a:hover {
     font-family: var(--font-family);
     border-radius: var(--radius-lg);
     border: 2px solid var(--color-border);
-    min-width: 200px;
+    width: 200px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     background-color: var(--color-background);
 }
 
@@ -702,7 +753,11 @@ a:hover {
     font-family: var(--font-family);
     border-radius: var(--radius-lg);
     border: 3px solid var(--color-border);
-    min-width: 200px;
+    width: 200px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .date-nav {
@@ -781,6 +836,12 @@ a:hover {
     color: var(--color-primary);
 }
 
+.edit-icon-img {
+    width: 0.9rem;
+    height: 0.9rem;
+    object-fit: contain;
+}
+
 .activity-entry-icon {
     width: 48px;
     height: 48px;
@@ -829,17 +890,22 @@ a:hover {
 
 .action-icon {
     font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .action-title {
     font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--color-text);
+    text-align: center;
 }
 
 .action-desc {
     font-size: var(--font-size-sm);
     color: var(--color-text-light);
+    text-align: center;
 }
 
 /* ===========================================
@@ -969,9 +1035,12 @@ a:hover {
 }
 
 .invite-code {
-    color: var(--color-text-light);
-    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    letter-spacing: 2px;
     margin-top: var(--spacing-sm);
+    text-align: center;
 }
 
 /* Tab Toggle */
@@ -1082,13 +1151,15 @@ a:hover {
 }
 
 .btn-secondary {
-    background-color: var(--color-background);
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #e8e8e8;
     color: var(--color-text);
-    border: 2px solid var(--color-border);
+    border: 2px solid #d0d0d0;
 }
 
 .btn-secondary:hover {
-    background-color: var(--color-border);
+    background-color: #d0d0d0;
 }
 
 #edit-activity-form-container {

@@ -205,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modal-overlay').classList.remove('hidden'); 
             content.innerHTML = `
             <h2 class="text-center">Create a Household</h2>
-            <p class="text-small mb-md">Households are groups of PetStack members that can collaboratively log activities for your pets. Once your household is created, you will be provided an invite code that you can then share with others!</p>
+            <p class="text-small mb-md">Households are groups of PetStack members that can collaboratively log activities for your pets.</p>
+            <p class="text-small mb-md">Once your household is created, you will be provided an invite code that you can then share with others!</p>
             <form id="create-household-form">
                 <label>Your household's name</label>
                 <input type="text" name="householdName" required>

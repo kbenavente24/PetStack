@@ -71,14 +71,15 @@ export function updatePetAvatar(petName) {
     }
 }
 
-export function addPetCardFunctionality(householdId, onPetAdded) {
+export function addPetCardFunctionality(household, onPetAdded) {
     const addPetButton = document.getElementById('btn-add-pet');
     addPetButton.addEventListener('click', () => {
-        showAddPetModal(householdId, onPetAdded);
+        showAddPetModal(household, onPetAdded);
     });
 }
 
-function showAddPetModal(householdId, onPetAdded) {
+function showAddPetModal(household, onPetAdded) {
+    const householdId = household.householdId || household;
     setModalContent(`
         <h2 class="text-center">Pet Information</h2>
         <p class="text-small mb-md">Before adding your pet, we'll need a bit of info!</p>
@@ -114,19 +115,21 @@ function showAddPetModal(householdId, onPetAdded) {
                 body: JSON.stringify(data)
             });
 
-            showFirstPetAddedModal(onPetAdded);
+            showFirstPetAddedModal(household, onPetAdded);
         } catch (error) {
             console.error('Failed to add pet:', error);
         }
     });
 }
 
-function showFirstPetAddedModal(onPetAdded) {
+function showFirstPetAddedModal(household, onPetAdded) {
     setModalContent(`
         <h2 class="text-center">Your pet has been added!</h2>
-        <p class="text-small mb-md">What would you like to do next?</p>
-        <button type="click" class="modal-btn" id="start-logging-activities">Start logging activities</button>
-        <button type="click" class="modal-btn btn-secondary">Invite others</button>
+        <p class="text-small text-center mb-md">What would you like to do next?</p>
+        <div class="edit-activity-options">
+            <button class="modal-btn" id="start-logging-activities">Start logging activities</button>
+            <button class="modal-btn btn-secondary" id="invite-others">Invite others</button>
+        </div>
     `);
     document.getElementById('modal-close').classList.add('hidden');
 
@@ -137,5 +140,30 @@ function showFirstPetAddedModal(onPetAdded) {
         if (onPetAdded) {
             await onPetAdded();
         }
+    });
+
+    document.getElementById('invite-others').addEventListener('click', () => {
+        setModalContent(`
+            <h2 class="text-center">Invite Others</h2>
+            <p class="text-small text-center mb-md">This is your permanent invite code for others to join your household. Copy and paste to share with others! This code can also be accessed in the households page.</p>
+            <p class="text-center" style="font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 1rem;">${household.inviteCode}</p>
+            <div class="edit-activity-options">
+                <button class="modal-btn" id="btn-start-logging">Start logging activities</button>
+                <button class="modal-btn btn-secondary" id="btn-view-household">View my household</button>
+            </div>
+        `);
+        document.getElementById('modal-close').classList.add('hidden');
+
+        document.getElementById('btn-start-logging').addEventListener('click', async () => {
+            hideModal();
+            document.getElementById('modal-close').classList.remove('hidden');
+            if (onPetAdded) {
+                await onPetAdded();
+            }
+        });
+
+        document.getElementById('btn-view-household').addEventListener('click', () => {
+            window.location.href = 'households.html';
+        });
     });
 }

@@ -38,7 +38,8 @@ export function createHouseholdCardFunctionality() {
 function showCreateHouseholdModal() {
     setModalContent(`
         <h2 class="text-center">Create a Household</h2>
-        <p class="text-small mb-md">Households are groups of PetStack members that can collaboratively log activities for your pets. Once your household is created, you will be provided an invite code that you can then share with others!</p>
+        <p class="text-small mb-md">Households are groups of PetStack members that can collaboratively log activities for your pets.</p>
+        <p class="text-small mb-md">Once your household is created, you will be provided an invite code that you can then share with others!</p>
         <form id="create-household-form">
             <label>Your household's name</label>
             <input type="text" name="householdName" required>
@@ -74,13 +75,13 @@ function showFirstTimeHouseholdCreation(household) {
     topPageGreeting.textContent = household.householdName;
 
     const firstHouseholdMessage = document.getElementById('empty-state-message');
-    firstHouseholdMessage.textContent = "Now that you've created a household, it's time to add a pet. From there, you could either begin stacking or invite friends and family to your household!";
+    firstHouseholdMessage.textContent = "Now that you've created a household, it's time to add your first pet! Once you've done that, you can either begin logging activities or invite friends and family!";
 
     document.getElementById('btn-add-pet').classList.remove('hidden');
     document.getElementById('btn-create-household').classList.add('hidden');
     document.getElementById('btn-join-household').classList.add('hidden');
 
-    addPetCardFunctionality(household.householdId, async () => {
+    addPetCardFunctionality(household, async () => {
         populateHouseholdDropdown([household], household.householdId);
         setupHouseholdDropdownHandler();
         await loadPetsForHousehold(household.householdId);
@@ -135,6 +136,7 @@ function showJoinHouseholdSuccess(household) {
             <button class="modal-btn btn-secondary" id="btn-go-to-households">Join or create another household</button>
         </div>
     `);
+    document.getElementById('modal-close').classList.add('hidden');
 
     document.getElementById('btn-view-activity-log').addEventListener('click', async () => {
         hideModal();
