@@ -220,6 +220,27 @@ export function setupDateDisplay() {
 
     const previousDayButton = document.getElementById('date-prev');
     const nextDayButton = document.getElementById('date-next');
+    const datePicker = document.getElementById('date-picker');
+    datePicker.value = today.toISOString().split('T')[0];
+    datePicker.max = rememberCurrentDay.toISOString().split('T')[0];
+
+    const todayLabel = document.getElementById('today-label');
+
+    function updateNextButtonState() {
+        const isToday = today.toDateString() === rememberCurrentDay.toDateString();
+        if (isToday) {
+            nextDayButton.disabled = true;
+            nextDayButton.style.opacity = '0.3';
+            nextDayButton.style.cursor = 'default';
+            todayLabel.style.display = '';
+        } else {
+            nextDayButton.disabled = false;
+            nextDayButton.style.opacity = '1';
+            nextDayButton.style.cursor = 'pointer';
+            todayLabel.style.display = 'none';
+        }
+    }
+    updateNextButtonState();
 
     previousDayButton.addEventListener('click', async () => {
         today.setDate(today.getDate() - 1);
@@ -234,6 +255,8 @@ export function setupDateDisplay() {
             day: 'numeric',
             year: 'numeric'
         });
+        datePicker.value = today.toISOString().split('T')[0];
+        updateNextButtonState();
         displayActivityLog(changedActivityLog);
     });
 
@@ -252,6 +275,30 @@ export function setupDateDisplay() {
             day: 'numeric',
             year: 'numeric'
         });
+        datePicker.value = today.toISOString().split('T')[0];
+        updateNextButtonState();
+        displayActivityLog(changedActivityLog);
+    });
+
+    datePicker.addEventListener('change', async () => {
+        const selectedDate = new Date(datePicker.value + 'T00:00:00');
+        if (selectedDate > rememberCurrentDay) {
+            datePicker.value = rememberCurrentDay.toISOString().split('T')[0];
+            return;
+        }
+        today = selectedDate;
+        const { start, end } = getDayRange(today);
+        const householdId = document.getElementById('household-dropdown').value;
+        const petId = document.getElementById('pet-dropdown').value;
+
+        const changedActivityLog = await apiCall(`/api/activity/pet?start=${start}&end=${end}&householdId=${householdId}&petId=${petId}`);
+
+        dateSpan.textContent = today.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        updateNextButtonState();
         displayActivityLog(changedActivityLog);
     });
 }

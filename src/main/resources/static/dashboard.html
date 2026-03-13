@@ -70,9 +70,13 @@
             </div>
 
             <div class="date-nav" id="date-nav">
-                <button id="date-prev">←</button>
-                <span id="activity-date"></span>
-                <button class ="date-next" id="date-next">→</button>
+                <span id="activity-date" class="hidden"></span>
+                <span id="today-label" class="today-label">Today</span>
+                <div class="date-controls">
+                    <button id="date-prev">←</button>
+                    <input type="date" id="date-picker" class="date-picker">
+                    <button class="date-next" id="date-next">→</button>
+                </div>
             </div>
 
             <div class="activity-buttons">

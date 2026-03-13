@@ -12,7 +12,7 @@ import io.jsonwebtoken.Jwts;
 public class JwtService {
 
     private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
-    private final long EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24 hours
+    private final long EXPIRATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     public String generateToken(User user) {
         Date now = new Date();
