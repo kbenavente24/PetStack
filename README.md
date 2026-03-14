@@ -7,6 +7,8 @@ My development of this app wasn't an attempt to reinvent the wheel — this defi
 
 Another reason for developing this app was to dive deeper into Spring/Spring Boot and build a larger-scale Java project. As an aspiring backend software engineer whose main language of choice is Java, I wanted to build something that implements tools, techniques, and design patterns commonly used in professional and enterprise environments. Over the 3 months I've spent developing this application (and continuing to work on it), I've learned a ton that I'm confident will carry over into the problems I solve in the future.
 
+<img src="docs/images/petstack-dashboard.png" alt="Dashboard" width="50%">
+
 ## :cat: Tech Stack
 - **Backend:** Java 21, Spring Boot 4.0.1 (Spring MVC, Spring Security, Spring Data JPA)
 - **Frontend:** HTML5, CSS3, vanilla JavaScript (ES6 modules)
