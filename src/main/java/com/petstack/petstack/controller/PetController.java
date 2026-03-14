@@ -24,7 +24,6 @@ public class PetController {
     }
     
     // Inner class to represent the incoming JSON request
-    // You could also put this in a separate "dto" package
     public static class CreatePetRequest {
         private String petName;
         private Integer householdId;

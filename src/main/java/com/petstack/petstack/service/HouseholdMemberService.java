@@ -75,10 +75,8 @@ public class HouseholdMemberService {
     
 
     public List<HouseholdMemberResponse> getHouseholdMembersOrdered(String currentEmail, Integer householdId) {
-        // 1. Fetch all members of the household
         List<HouseholdMember> members = householdMemberRepository.findByHouseholdHouseholdId(householdId);
 
-        // 2. Sort: current user first, then alphabetically by displayName
         members.sort((a, b) -> {
             // Current user always comes first
             if (a.getUser().getEmail().equals(currentEmail)) return -1;
@@ -87,7 +85,7 @@ public class HouseholdMemberService {
             return a.getUser().getDisplayName().compareToIgnoreCase(b.getUser().getDisplayName());
         });
 
-        // 3. Convert entities to DTOs
+        // Convert entities to DTOs
         return members.stream()
                 .map(HouseholdMemberResponse::new)
                 .collect(Collectors.toList());

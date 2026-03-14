@@ -35,7 +35,7 @@ export function showLogActivityConfirmation(activityType) {
     };
     const iconSrc = activityIcons[activityType];
 
-    if(currDate.toISOString().split('T')[0] == today.toISOString().split('T')[0]) {
+    if(currDate.toLocaleDateString('en-CA') == today.toLocaleDateString('en-CA')) {
         const currDate = new Date();
         const timeString = currDate.toLocaleTimeString('en-US', {
             hour: 'numeric',
@@ -49,6 +49,7 @@ export function showLogActivityConfirmation(activityType) {
             <p class="text-center mb-md">Log that <strong>${petName}</strong> ${activityVerb} @ ${timeString}?</p>
             <div class="edit-activity-options">
                 <button class="modal-btn" id="btn-confirm-log">Confirm</button>
+                <button class="modal-btn" id="btn-change-time-log" style="background-color: var(--color-text-light);">Change Time</button>
                 <button class="modal-btn btn-secondary" id="btn-cancel-log">Back</button>
             </div>
         `);
@@ -56,6 +57,37 @@ export function showLogActivityConfirmation(activityType) {
         document.getElementById('btn-confirm-log').addEventListener('click', async () => {
             hideModal();
             await logActivity(activityType);
+        });
+
+        document.getElementById('btn-change-time-log').addEventListener('click', () => {
+            setModalContent(`
+                <h2 class="text-center">Log Activity</h2>
+                <div class="text-center mb-md"><img src="${iconSrc}" alt="${activityType}" class="modal-activity-icon"></div>
+                <form id="custom-time-log-form">
+                    <label>Select time that <strong>${petName}</strong> ${activityVerb}</label>
+                    <input type="time" name="activityTime" required>
+                    <div class="edit-activity-options">
+                        <button type="submit" class="modal-btn">Confirm</button>
+                        <button type="button" class="modal-btn btn-secondary" id="btn-back-to-confirm">Back</button>
+                    </div>
+                </form>
+            `);
+
+            document.getElementById('custom-time-log-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const selectedTime = document.querySelector('input[name="activityTime"]').value;
+                const [hours, minutes] = selectedTime.split(':');
+                const timestamp = new Date();
+                timestamp.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+                hideModal();
+                await logActivity(activityType, timestamp.toISOString());
+            });
+
+            document.getElementById('btn-back-to-confirm').addEventListener('click', () => {
+                hideModal();
+                showLogActivityConfirmation(activityType);
+            });
         });
 
         document.getElementById('btn-cancel-log').addEventListener('click', () => {
@@ -106,7 +138,7 @@ export async function logActivity(activityType, customTimestamp) {
     const petId = document.getElementById('pet-dropdown').value;
     const householdId = document.getElementById('household-dropdown').value;
 
-    const isViewingPastDay = new Date().toISOString().split('T')[0] !== today.toISOString().split('T')[0];
+    const isViewingPastDay = new Date().toLocaleDateString('en-CA') !== today.toLocaleDateString('en-CA');
     const activityTimestamp = customTimestamp || new Date().toISOString();
     const { start, end } = getDayRange(isViewingPastDay ? today : new Date());
 
@@ -221,8 +253,8 @@ export function setupDateDisplay() {
     const previousDayButton = document.getElementById('date-prev');
     const nextDayButton = document.getElementById('date-next');
     const datePicker = document.getElementById('date-picker');
-    datePicker.value = today.toISOString().split('T')[0];
-    datePicker.max = rememberCurrentDay.toISOString().split('T')[0];
+    datePicker.value = today.toLocaleDateString('en-CA');
+    datePicker.max = rememberCurrentDay.toLocaleDateString('en-CA');
 
     const todayLabel = document.getElementById('today-label');
 
@@ -255,7 +287,7 @@ export function setupDateDisplay() {
             day: 'numeric',
             year: 'numeric'
         });
-        datePicker.value = today.toISOString().split('T')[0];
+        datePicker.value = today.toLocaleDateString('en-CA');
         updateNextButtonState();
         displayActivityLog(changedActivityLog);
     });
@@ -275,7 +307,7 @@ export function setupDateDisplay() {
             day: 'numeric',
             year: 'numeric'
         });
-        datePicker.value = today.toISOString().split('T')[0];
+        datePicker.value = today.toLocaleDateString('en-CA');
         updateNextButtonState();
         displayActivityLog(changedActivityLog);
     });
@@ -283,7 +315,7 @@ export function setupDateDisplay() {
     datePicker.addEventListener('change', async () => {
         const selectedDate = new Date(datePicker.value + 'T00:00:00');
         if (selectedDate > rememberCurrentDay) {
-            datePicker.value = rememberCurrentDay.toISOString().split('T')[0];
+            datePicker.value = rememberCurrentDay.toLocaleDateString('en-CA');
             return;
         }
         today = selectedDate;

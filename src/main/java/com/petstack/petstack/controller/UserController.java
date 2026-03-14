@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 
-@RestController  // Tells Spring: "This handles HTTP requests and returns JSON"
-@RequestMapping("/api/users")  // Base path for all endpoints in this controller
+@RestController
+@RequestMapping("/api/users") 
 public class UserController {
 
     private final UserService userService;
-
-    // Constructor injection - Spring automatically provides the UserService
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -35,10 +33,6 @@ public class UserController {
         String email = authentication.getName();
         userService.changeDisplayName(newDisplayName, email);
     }
-    
-    
-    
-    
 
     // Inner class to represent the incoming JSON request
     // You could also put this in a separate "dto" package

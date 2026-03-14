@@ -27,10 +27,7 @@ public class HouseholdMemberController {
     public HouseholdMemberController(HouseholdMemberService householdMemberService){
         this.householdMemberService = householdMemberService;
     }
-
-    //This is an endpoint intended for the event of a user joining a household. 
-    //This is similar to the household controller but, obviously, cant be used in the instances where
-    //a user joins because it would create an unintended household.
+    
     @PostMapping
     public HouseholdInfo registerHouseholdMember(@RequestBody RegisterHouseholdMemberRequest request, Authentication authentication) {
         String email = authentication.getName();

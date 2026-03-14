@@ -65,6 +65,9 @@
                         required
                         placeholder="Re-enter your password"
                     >
+                    <label class="show-password-label">
+                        <input type="checkbox" id="toggle-password"> Show passwords
+                    </label>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
@@ -77,5 +80,13 @@
     </section>
 
     <script type="module" src="js/auth.js"></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('change', function () {
+            const pw = document.getElementById('password');
+            const cpw = document.getElementById('confirmPassword');
+            pw.type = this.checked ? 'text' : 'password';
+            cpw.type = this.checked ? 'text' : 'password';
+        });
+    </script>
 </body>
 </html>

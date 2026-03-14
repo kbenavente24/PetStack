@@ -38,10 +38,6 @@ public class PetService {
     public void deletePet(Integer petId){
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet Not Found!"));
 
-        // if(!pet.getOwners().contains(currentUser)){
-        //     throw new RuntimeException("You don't own this pet!");
-        // }
-
         petRepository.delete(pet);
     }
 
