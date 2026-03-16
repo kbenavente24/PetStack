@@ -11,7 +11,6 @@ public class HouseholdMemberResponse {
     private String userRole;
     private LocalDateTime createdAt;
 
-    // Constructor that converts HouseholdMember entity to response DTO
     public HouseholdMemberResponse(HouseholdMember member) {
         this.userId = member.getUser().getUserId();
         this.displayName = member.getUser().getDisplayName();
@@ -20,7 +19,6 @@ public class HouseholdMemberResponse {
         this.createdAt = member.getCreatedAt();
     }
 
-    // Getters (required for JSON serialization)
     public Integer getUserId() {
         return userId;
     }

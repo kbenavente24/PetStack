@@ -3,7 +3,6 @@ package com.petstack.petstack.dto.response;
 import java.time.LocalDate;
 
 import com.petstack.petstack.model.Pet;
-import com.petstack.petstack.model.User;
 
 public class PetResponse {
     private Integer petId;
@@ -11,9 +10,7 @@ public class PetResponse {
     private LocalDate petBirthdate;
     private String petSpecies;
     private String petGender;
-    // NOT including owners or activities - breaks the cycle!
 
-    // Constructor takes PET, not User
     public PetResponse(Pet pet) {
         this.petId = pet.getPetId();
         this.petName = pet.getPetName();
@@ -22,7 +19,6 @@ public class PetResponse {
         this.petGender = pet.getPetGender();
     }
 
-    // Getters
     public Integer getPetId() { return petId; }
     public String getPetName() { return petName; }
     public LocalDate getPetBirthdate() { return petBirthdate; }

@@ -51,10 +51,8 @@ public class HouseholdMemberService {
     }
 
     /*
-    
     IMPLEMENT THIS IN CONTROLLER, AND FRONTNEND EVENTUALLY. THIS IS MEANT FOR WHEN A USER LEAVES A HOUSEHOLD, MEANING THEY ARE
     NO LONGER A HOUSEHOLD MEMBER
-
     */
 
     public void removeHouseholdMember(String email, Integer householdId){

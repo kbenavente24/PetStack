@@ -12,7 +12,6 @@ public class UserResponse {
     private String profilePicture;
     private List<HouseholdInfo> households;
 
-    // Constructor that converts Entity → DTO
     public UserResponse(User user) {
         this.userId = user.getUserId();
         this.email = user.getEmail();
@@ -28,7 +27,6 @@ public class UserResponse {
             )).toList();        
     }
 
-    // Getters (Jackson needs these to serialize to JSON)
     public Integer getUserId() { return userId; }
     public String getEmail() { return email; }
     public String getDisplayName() { return displayName; }

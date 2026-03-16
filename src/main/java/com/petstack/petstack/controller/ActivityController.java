@@ -61,9 +61,6 @@ public class ActivityController {
         Activity activity = activityService.updateActivityType(activityId, email, request.getNewType());
         return new ActivityResponse(activity, email);
     }
-
-    // Inner class to represent the incoming JSON request
-    // You could also put this in a separate "dto" package
     public static class CreateActivityRequest {
         private Integer petId;
         private ActivityType activityType;

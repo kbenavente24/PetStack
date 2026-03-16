@@ -23,13 +23,11 @@ public class PetController {
         return new PetResponse(petService.createPet(request.getPetName(), request.getHouseholdId(), request.getPetSpecies()));
     }
     
-    // Inner class to represent the incoming JSON request
     public static class CreatePetRequest {
         private String petName;
         private Integer householdId;
         private String petSpecies;
 
-        // Getters and setters (required for JSON deserialization)
         public String getPetName() { return petName; }
         public void setPetName(String petName) { this.petName = petName; }
         public Integer getHouseholdId() { return householdId; }

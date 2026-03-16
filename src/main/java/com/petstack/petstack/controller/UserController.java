@@ -7,8 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -34,14 +32,11 @@ public class UserController {
         userService.changeDisplayName(newDisplayName, email);
     }
 
-    // Inner class to represent the incoming JSON request
-    // You could also put this in a separate "dto" package
     public static class CreateUserRequest {
         private String email;
         private String password;
         private String displayName;
 
-        // Getters and setters (required for JSON deserialization)
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
 
