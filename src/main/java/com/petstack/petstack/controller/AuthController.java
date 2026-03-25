@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.petstack.petstack.dto.response.SignupResponse;
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.service.AuthService;
 
@@ -39,8 +40,9 @@ public class AuthController {
 }
 
     @PostMapping("/signup")
-    public User signUp(@RequestBody CreateSignupRequest request){
-        return authService.signUp(request.getEmail(), request.getPassword(), request.getDisplayName());
+    public SignupResponse signUp(@RequestBody CreateSignupRequest request){
+        User user = authService.signUp(request.getEmail(), request.getPassword(), request.getDisplayName());
+        return new SignupResponse(user.getEmail(), user.getDisplayName());
     }
 
     public static class CreateSignupRequest {
