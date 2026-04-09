@@ -1,11 +1,6 @@
 package com.petstack.petstack.service;
-
-import java.util.Map;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.petstack.petstack.dto.response.UserResponse;
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.repository.UserRepository;
 
@@ -25,7 +20,11 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public Map<String, Object> login(String email, String password){
+    public record LoginResult(String token, User user){}
+
+
+
+    public LoginResult login(String email, String password){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email not found! Please try again."));
 
@@ -35,10 +34,7 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
 
-        return Map.of(
-            "token", token,
-            "user", new UserResponse(user)
-        );
+        return new LoginResult(token, user);
     }
 
     public User signUp(String email, String password, String displayName){

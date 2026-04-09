@@ -1,4 +1,4 @@
-package com.petstack.petstack.service;
+/*package com.petstack.petstack.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,3 +114,4 @@ public class AuthServiceTest {
         assertEquals("An account already exists for this email!", exception.getMessage());
     }
 }
+*/

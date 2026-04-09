@@ -34,9 +34,6 @@ async function setupDashboard() {
             method: 'GET'
         });
 
-        console.log(getUserForHouseholds.households[0]);
-        console.log(getUserForHouseholds.households.length);
-
         if(getUserForHouseholds.households.length === 0){
             document.querySelector('.dashboard-main').classList.add('ready');
             return;        

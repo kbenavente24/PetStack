@@ -64,7 +64,7 @@ function setupLoginForm() {
             console.log('Login successful:', response);
 
             localStorage.setItem('token', response.token);
-            localStorage.setItem('displayName', response.user.displayName);
+            localStorage.setItem('displayName', response.displayName);
 
             window.location.href = '/dashboard.html';
 

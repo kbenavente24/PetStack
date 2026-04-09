@@ -1,6 +1,5 @@
 package com.petstack.petstack.controller;
 
-import java.util.Map;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +21,27 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginRequest request){
-        return authService.login(request.getEmail(), request.getPassword());
+    public LoginResponse login(@RequestBody LoginRequest request){
+        AuthService.LoginResult result = authService.login(request.getEmail(), request.getPassword());
+        return new LoginResponse(result.token(), result.user().getDisplayName());
+    }
+
+    public static class LoginResponse{
+        private String token;
+        private String displayName;
+
+        public LoginResponse(String token, String displayName){
+            this.token = token;
+            this.displayName = displayName;
+        }
+
+        public String getToken(){
+            return token;
+        }
+
+        public String getDisplayName(){
+            return displayName;
+        }
     }
 
     public static class LoginRequest{
