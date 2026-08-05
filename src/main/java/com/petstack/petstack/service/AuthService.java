@@ -2,6 +2,7 @@ package com.petstack.petstack.service;
 
 import java.util.Map;
 
+import com.petstack.petstack.exception.InvalidCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +28,10 @@ public class AuthService {
 
     public Map<String, Object> login(String email, String password){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email not found! Please try again."));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password."));
 
         if(!passwordEncoder.matches(password, user.getPasswordHash())){
-            throw new RuntimeException("Incorrect password! Please try again.");
+            throw new InvalidCredentialsException("Invalid email or password.");
         }
 
         String token = jwtService.generateToken(user);
@@ -42,7 +43,6 @@ public class AuthService {
     }
 
     public User signUp(String email, String password, String displayName){
-        User user = userService.createUser(email, password, displayName);
-        return user;
+        return userService.createUser(email, password, displayName);
     }
 }
