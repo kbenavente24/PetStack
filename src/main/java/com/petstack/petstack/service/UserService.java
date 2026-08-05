@@ -1,5 +1,7 @@
 package com.petstack.petstack.service;
 
+import com.petstack.petstack.exception.DuplicateResourceException;
+import com.petstack.petstack.exception.ResourceNotFoundException;
 import com.petstack.petstack.model.User;
 import com.petstack.petstack.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +20,7 @@ public class UserService {
 
     public User createUser(String email, String password, String displayName) {
         if(userRepository.existsByEmail(email)){
-            throw new RuntimeException("An account already exists for this email!");
+            throw new DuplicateResourceException("An account already exists for this email.");
         }
 
         // Hash the password before storing
@@ -29,7 +31,7 @@ public class UserService {
     }
 
     public void changeDisplayName(String newName, String email){
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Error getting user"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         user.setDisplayName(newName);
         userRepository.save(user);
@@ -41,10 +43,10 @@ public class UserService {
     }
 
     public User getUserByID(Integer userId){
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 
     public User getUserByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
     }
 }
