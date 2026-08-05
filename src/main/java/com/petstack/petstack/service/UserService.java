@@ -38,14 +38,6 @@ public class UserService {
 
     }
 
-    public Boolean login(String email, String password){
-        return true;
-    }
-
-    public User getUserByID(Integer userId){
-        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
-    }
-
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
     }
